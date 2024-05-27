@@ -1,5 +1,10 @@
 `timescale 1ns / 1ps
 
+/*
+Se implementa la etapa de decodificación de instrucciones (ID: Instruction Decode),
+manejando las señales de control y datos necesarios para la ejecución de las instrucciones
+*/
+
 module id
     #(
         parameter REGISTER_BANK_SIZE = 32,

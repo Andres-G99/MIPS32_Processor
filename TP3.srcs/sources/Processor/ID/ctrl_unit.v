@@ -1,5 +1,10 @@
 timescale 1ns / 1ps
 
+/*
+Se define la unidad de control (ctrl_unit). Es responsable de generar las señales de control 
+necesarias para cada instrucción, basándose en en los codigos de la instrucción
+*/
+
 module ctrl_unit
     #(
         // OPCODE parameters
