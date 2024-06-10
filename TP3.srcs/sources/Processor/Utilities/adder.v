@@ -2,7 +2,7 @@
 
 module adder
     #(
-        parameter DATA_WIDTH = 30
+        parameter DATA_WIDTH = 32
     )
     (
         input wire [DATA_WIDTH-1:0] i_a,
