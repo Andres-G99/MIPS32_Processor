@@ -44,7 +44,7 @@ module id
         output wire [4 : 0] o_rt, // registro fuente RT
         output wire [4 : 0] o_rd, // registro destino RD
         output wire [5 : 0] o_funct, // función de la instrucción
-        output wire [5 : 0] o_op, // operación de la instrucción
+        output wire [5 : 0] o_opp, // operación de la instrucción
         output wire [BUS_SIZE - 1 : 0] o_shamt_ext_unsigned, // shamt extendido sin signo
         output wire [BUS_SIZE - 1 : 0] o_inm_ext_signed, // inmediato extendido con signo
         output wire [BUS_SIZE - 1 : 0] o_inm_upp, // inmediato extendido con ceros en los bits menos significativos
@@ -54,7 +54,7 @@ module id
     );
 
     /* Internal wires */
-    wire is_not_equal_result; // señal para saber si dos valores son diferentes
+    wire are_diff_values_result; // señal para saber si dos valores son diferentes
     wire is_nop_result; // señal para saber si la instrucción es un NOP
     wire [1 : 0] jmp_ctrl; // control para saber si la instrucción es de salto
     wire [19 : 0] ctrl_register; // registros de control de la etapa ID
@@ -77,7 +77,7 @@ module id
     assign jump_pc_dir = { i_next_seq_pc[31:28], dir_ext_unsigned_shifted[27:0] }; // calcular la dirección de salto
 
     /* Assignment output wires */
-    assign o_op = i_instruction[31:26];
+    assign o_opp = i_instruction[31:26];
     assign o_rs = i_instruction[25:21];
     assign o_rt = i_instruction[20:16];
     assign o_rd = i_instruction[15:11];
@@ -118,11 +118,11 @@ module id
     /* Control: generar señales de control necesarias */
     ctrl_register ctrl_register_unit 
     (
-        .i_bus_A_diff_bus_B (is_not_equal_result),
-        .i_instr_nop        (is_nop_result),
-        .i_opp              (o_op),
-        .i_funct            (o_funct),
-        .o_ctrl_register    (ctrl_registers)
+        .i_are_diff_values (are_diff_values_result),
+        .i_instr_nop (is_nop_result),
+        .i_opp (o_opp),
+        .i_funct (o_funct),
+        .o_ctrl_register (ctrl_register)
     );
 
     /* Multiplexor para seleccionar el siguiente registro de control de la etapa */
@@ -176,15 +176,15 @@ module id
     );
 
     /* Extend signed for INM */
-    sig_extend 
+    sign_extend 
     #(
-        .REG_IN_SIZE  (16), 
-        .REG_OUT_SIZE (BUS_SIZE)
+        .DATA_ORIGINAL_SIZE (16), 
+        .DATA_EXTENDED_SIZE (BUS_SIZE)
     ) 
-    sig_extend_inm_unit  
+    sign_extend_inm_unit  
     (
-        .i_reg (inm),
-        .o_reg (o_inm_ext_signed)
+        .i_value (inm),
+        .o_extended_value (o_inm_ext_signed)
     );
     
     /* Extend unsigned for INM */
@@ -200,65 +200,65 @@ module id
     );    
 
     /* Verificar A igual a B */
-    is_not_equal 
+    diff_values 
     #(
-        .BUS_SIZE (BUS_SIZE)
+        .DATA_LEN (BUS_SIZE)
     )
-    is_not_equal_unit 
+    diff_values_unit 
     (
-        .in_a         (i_ex_data_A),
-        .in_b         (i_ex_data_B),
-        .is_not_equal (is_not_equal_result)
+        .i_data_A (i_ex_data_A),
+        .i_data_B (i_ex_data_B),
+        .o_are_diff (are_diff_values_result)
     );
 
     /* Verificar instruccion NOP */
-    is_zero 
+    is_nop 
     #(
-        .BUS_SIZE (BUS_SIZE)
+        .DATA_LEN (BUS_SIZE)
     )
     is_nop_unit 
     (
-        .in      (i_instruction),
-        .is_zero (is_nop_result)
+        .i_opp (i_instruction),
+        .o_is_nop (is_nop_result)
     );
 
 
     /* Shift left 2 for extended signed INM */
     shift_left 
     #(
-        .BUS_SIZE   (BUS_SIZE), 
-        .SHIFT_LEFT (2)
+        .DATA_LEN (BUS_SIZE), 
+        .POS_TO_SHIFT (2)
     ) 
     shift_left_ext_inm_signed_unit  
     (
-        .in  (o_inm_ext_signed),
-        .out (inm_ext_signed_shifted)
+        .i_value (o_inm_ext_signed),
+        .o_shifted (inm_ext_signed_shifted)
     );
 
 
     /* Shift left 2 for DIR */
     shift_left 
     #(
-        .BUS_SIZE   (BUS_SIZE), 
-        .SHIFT_LEFT (2)
+        .DATA_LEN (BUS_SIZE), 
+        .POS_TO_SHIFT (2)
     ) 
     shift_left_dir_unit 
     (
-        .in  (dir_ext_unsigned),
-        .out (dir_ext_unsigned_shifted)
+        .i_value (dir_ext_unsigned),
+        .o_shifted (dir_ext_unsigned_shifted)
     );
 
 
     /* Shift left 16 for INM */
     shift_left 
     #(
-        .BUS_SIZE   (BUS_SIZE), 
-        .SHIFT_LEFT (16)
+        .DATA_LEN (BUS_SIZE), 
+        .POS_TO_SHIFT (16)
     ) 
     shift_left_inm_unit 
     (
-        .in  (o_inm_ext_unsigned),
-        .out (o_inm_upp)
+        .i_value (o_inm_ext_unsigned),
+        .o_shifted (o_inm_upp)
     );
 
     /* Calcular next branch PC */
