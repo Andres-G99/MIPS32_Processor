@@ -54,7 +54,7 @@ module id
     );
 
     /* Internal wires */
-    wire are_diff_values_result; // señal para saber si dos valores son diferentes
+    wire are_equal_values_result; // señal para saber si dos valores son diferentes
     wire is_nop_result; // señal para saber si la instrucción es un NOP
     wire [1 : 0] jmp_ctrl; // control para saber si la instrucción es de salto
     wire [19 : 0] ctrl_register; // registros de control de la etapa ID
@@ -118,7 +118,7 @@ module id
     /* Control: generar señales de control necesarias */
     ctrl_register ctrl_register_unit 
     (
-        .i_are_diff_values (are_diff_values_result),
+        .i_are_equal (are_equal_values_result),
         .i_instr_nop (is_nop_result),
         .i_opp (o_opp),
         .i_funct (o_funct),
@@ -152,63 +152,67 @@ module id
     );
 
     /* Extend unsigned for DIR */
-    unsig_extend 
+    extend 
     #(
-        .REG_IN_SIZE  (26), 
-        .REG_OUT_SIZE (BUS_SIZE)
+        .DATA_ORIGINAL_SIZE  (26), 
+        .DATA_EXTENDED_SIZE (BUS_SIZE)
     ) 
-    unsig_extend_dir_unit  
+    extend_dir_unit  
     (
-        .i_reg (dir),
-        .o_reg (dir_ext_unsigned)
+        .i_value (dir),
+        .i_is_signed (1'b0),
+        .o_extended_value (dir_ext_unsigned)
     );
 
     /* Extend unsigned for SHAMT */
-    unsig_extend 
+    extend 
     #(
-        .REG_IN_SIZE  (5), 
-        .REG_OUT_SIZE (BUS_SIZE)
+        .DATA_ORIGINAL_SIZE  (5), 
+        .DATA_EXTENDED_SIZE (BUS_SIZE)
     ) 
-    unsig_extend_shamt_unit  
+    extend_shamt_unit  
     (
-        .i_reg (shamt),
-        .o_reg (o_shamt_ext_unsigned)
+        .i_value (shamt),
+        .i_is_signed (1'b0),
+        .o_extended_value (o_shamt_ext_unsigned)
     );
 
     /* Extend signed for INM */
-    sign_extend 
+    extend 
     #(
         .DATA_ORIGINAL_SIZE (16), 
         .DATA_EXTENDED_SIZE (BUS_SIZE)
     ) 
-    sign_extend_inm_unit  
+    extend_signed_inm_unit  
     (
         .i_value (inm),
+        .i_is_signed (1'b1),
         .o_extended_value (o_inm_ext_signed)
     );
     
     /* Extend unsigned for INM */
-    unsig_extend 
+    extend 
     #(
-        .REG_IN_SIZE  (16), 
-        .REG_OUT_SIZE (BUS_SIZE)
+        .DATA_ORIGINAL_SIZE  (16), 
+        .DATA_EXTENDED_SIZE (BUS_SIZE)
     ) 
-    unsig_extend_inm_unit 
+    extend_unsigned_inm_unit 
     (
-        .i_reg (inm),
-        .o_reg (o_inm_ext_unsigned)
+        .i_value (inm),
+        .i_is_signed (1'b0),
+        .o_extended_value (o_inm_ext_unsigned)
     );    
 
     /* Verificar A igual a B */
-    diff_values 
+    is_equal 
     #(
         .DATA_LEN (BUS_SIZE)
     )
-    diff_values_unit 
+    is_equal_unit 
     (
         .i_data_A (i_ex_data_A),
         .i_data_B (i_ex_data_B),
-        .o_are_diff (are_diff_values_result)
+        .o_is_equal (are_equal_values_result)
     );
 
     /* Verificar instruccion NOP */

@@ -103,7 +103,7 @@ module ctrl_register
         parameter ALU_CTRL_SRC_B_NOTHING = 3'bxxx // Nothing
     )
     (
-        input  wire i_are_diff_values, // is bus A different from bus B?
+        input  wire i_are_equal, // is bus A different from bus B?
         input  wire i_instr_nop, // is nop?
         input  wire [5 : 0]  i_opp,
         input  wire [5 : 0]  i_funct,
@@ -238,8 +238,8 @@ module ctrl_register
     //                 ctrl_register = {next_pc_src, jmp_ctrl, reg_dst, alu_src_A, alu_src_B, alu_opp, mem_read_source, mem_write_source, mem_write, wb, mem_to_reg};
     //             end
     //             OPP_BEQ : begin
-    //                 next_pc_src <= !i_are_diff_values ? { CTRL_NEXT_PC_SRC_NOT_SEQ, CTRL_JMP_BRANCH } : { CTRL_NEXT_PC_SRC_SEQ, CTRL_NOT_JMP };
-    //                 jmp_ctrl <= i_are_diff_values ? CTRL_JMP_BRANCH : CTRL_NOT_JMP;
+    //                 next_pc_src <= i_are_equal ? CTRL_NEXT_PC_SRC_NOT_SEQ : CTRL_NEXT_PC_SRC_SEQ, CTRL_NOT_JMP;
+    //                 jmp_ctrl <= i_are_equal ? CTRL_JMP_BRANCH : CTRL_NOT_JMP;
     //                 reg_dst <= CTRL_REG_DST_NOTHING;
     //                 alu_src_A <= ALU_CTRL_SRC_A_NOTHING;
     //                 alu_src_B <= ALU_CTRL_SRC_B_NOTHING;
@@ -252,8 +252,8 @@ module ctrl_register
     //                 ctrl_register = {next_pc_src, jmp_ctrl, reg_dst, alu_src_A, alu_src_B, alu_opp, mem_read_source, mem_write_source, mem_write, wb, mem_to_reg};
     //             end
     //             OPP_BNE : begin
-    //                 next_pc_src <= i_are_diff_values ? { CTRL_NEXT_PC_SRC_NOT_SEQ, CTRL_JMP_BRANCH } : { CTRL_NEXT_PC_SRC_SEQ, CTRL_NOT_JMP };
-    //                 jmp_ctrl <= i_are_diff_values ? CTRL_JMP_BRANCH : CTRL_NOT_JMP;
+    //                 next_pc_src <= !i_are_equal ? CTRL_NEXT_PC_SRC_NOT_SEQ : CTRL_NEXT_PC_SRC_SEQ;
+    //                 jmp_ctrl <= !i_are_equal ? CTRL_JMP_BRANCH : CTRL_NOT_JMP;
     //                 reg_dst <= CTRL_REG_DST_NOTHING;
     //                 alu_src_A <= ALU_CTRL_SRC_A_NOTHING;
     //                 alu_src_B <= ALU_CTRL_SRC_B_NOTHING;
@@ -521,8 +521,8 @@ module ctrl_register
                 OPP_XORI : ctrl_register = { CTRL_NEXT_PC_SRC_SEQ,      CTRL_NOT_JMP,    CTRL_REG_DST_RT,      ALU_CTRL_SRC_A_BUS_A,   ALU_CTRL_SRC_B_USIG_INM,    ALU_CTRL_XORI,        CTRL_MEM_RD_SRC_NOTHING,       CTRL_MEM_WR_SRC_NOTHING,  CTRL_MEM_WRITE_DISABLE, CTRL_WB_ENABLE,  CTRL_MEM_TO_REG_ALU_RESULT };
                 OPP_LUI  : ctrl_register = { CTRL_NEXT_PC_SRC_SEQ,      CTRL_NOT_JMP,    CTRL_REG_DST_RT,      ALU_CTRL_SRC_A_BUS_A,   ALU_CTRL_SRC_B_UPPER_INM,   ALU_CTRL_LOAD_TYPE,   CTRL_MEM_RD_SRC_NOTHING,       CTRL_MEM_WR_SRC_NOTHING,  CTRL_MEM_WRITE_DISABLE, CTRL_WB_ENABLE,  CTRL_MEM_TO_REG_ALU_RESULT };
                 OPP_SLTI : ctrl_register = { CTRL_NEXT_PC_SRC_SEQ,      CTRL_NOT_JMP,    CTRL_REG_DST_RT,      ALU_CTRL_SRC_A_BUS_A,   ALU_CTRL_SRC_B_SIG_INM,     ALU_CTRL_SLTI,        CTRL_MEM_RD_SRC_NOTHING,       CTRL_MEM_WR_SRC_NOTHING,  CTRL_MEM_WRITE_DISABLE, CTRL_WB_ENABLE,  CTRL_MEM_TO_REG_ALU_RESULT };
-                OPP_BEQ  : ctrl_register = { !i_are_diff_values ? { CTRL_NEXT_PC_SRC_NOT_SEQ, CTRL_JMP_BRANCH } : { CTRL_NEXT_PC_SRC_SEQ, CTRL_NOT_JMP }, CTRL_REG_DST_NOTHING, ALU_CTRL_SRC_A_NOTHING, ALU_CTRL_SRC_B_NOTHING,     ALU_CTRL_BRANCH_TYPE, CTRL_MEM_RD_SRC_NOTHING,       CTRL_MEM_WR_SRC_NOTHING,  CTRL_MEM_WRITE_DISABLE, CTRL_WB_DISABLE, CTRL_MEM_TO_REG_NOTHING    };
-                OPP_BNE  : ctrl_register = {  i_are_diff_values ? { CTRL_NEXT_PC_SRC_NOT_SEQ, CTRL_JMP_BRANCH } : { CTRL_NEXT_PC_SRC_SEQ, CTRL_NOT_JMP }, CTRL_REG_DST_NOTHING, ALU_CTRL_SRC_A_NOTHING, ALU_CTRL_SRC_B_NOTHING,     ALU_CTRL_BRANCH_TYPE, CTRL_MEM_RD_SRC_NOTHING,       CTRL_MEM_WR_SRC_NOTHING,  CTRL_MEM_WRITE_DISABLE, CTRL_WB_DISABLE, CTRL_MEM_TO_REG_NOTHING    };
+                OPP_BEQ  : ctrl_register = { i_are_equal ? { CTRL_NEXT_PC_SRC_NOT_SEQ, CTRL_JMP_BRANCH } : { CTRL_NEXT_PC_SRC_SEQ, CTRL_NOT_JMP }, CTRL_REG_DST_NOTHING, ALU_CTRL_SRC_A_NOTHING, ALU_CTRL_SRC_B_NOTHING,     ALU_CTRL_BRANCH_TYPE, CTRL_MEM_RD_SRC_NOTHING,       CTRL_MEM_WR_SRC_NOTHING,  CTRL_MEM_WRITE_DISABLE, CTRL_WB_DISABLE, CTRL_MEM_TO_REG_NOTHING    };
+                OPP_BNE  : ctrl_register = { !i_are_equal ? { CTRL_NEXT_PC_SRC_NOT_SEQ, CTRL_JMP_BRANCH } : { CTRL_NEXT_PC_SRC_SEQ, CTRL_NOT_JMP }, CTRL_REG_DST_NOTHING, ALU_CTRL_SRC_A_NOTHING, ALU_CTRL_SRC_B_NOTHING,     ALU_CTRL_BRANCH_TYPE, CTRL_MEM_RD_SRC_NOTHING,       CTRL_MEM_WR_SRC_NOTHING,  CTRL_MEM_WRITE_DISABLE, CTRL_WB_DISABLE, CTRL_MEM_TO_REG_NOTHING    };
                 OPP_J    : ctrl_register = { CTRL_NEXT_PC_SRC_NOT_SEQ,  CTRL_JMP_DIR,    CTRL_REG_DST_NOTHING, ALU_CTRL_SRC_A_NOTHING, ALU_CTRL_SRC_B_NOTHING,     ALU_CTRL_JUMP_TYPE,   CTRL_MEM_RD_SRC_NOTHING,       CTRL_MEM_WR_SRC_NOTHING,  CTRL_MEM_WRITE_DISABLE, CTRL_WB_DISABLE, CTRL_MEM_TO_REG_NOTHING    };
                 OPP_JAL  : ctrl_register = { CTRL_NEXT_PC_SRC_NOT_SEQ,  CTRL_JMP_DIR,    CTRL_REG_DST_GPR_31,  ALU_CTRL_SRC_A_NOTHING, ALU_CTRL_SRC_B_NEXT_SEQ_PC, ALU_CTRL_JUMP_TYPE,   CTRL_MEM_RD_SRC_NOTHING,       CTRL_MEM_WR_SRC_NOTHING,  CTRL_MEM_WRITE_DISABLE, CTRL_WB_ENABLE,  CTRL_MEM_TO_REG_ALU_RESULT };
                 OPP_R_TYPE :
