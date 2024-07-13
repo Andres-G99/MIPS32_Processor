@@ -21,27 +21,35 @@ module tb_wb;
     );
 
     initial begin
-       
-        // Test case 31: Different ALU result, select ALU result
-        i_mem_to_reg = 0;
-        i_alu_result = 32'h12345678;
-        i_mem_result = 32'h87654321;
-        #10;
-        $display("i_mem_to_reg: %b, i_alu_result: %h, i_mem_result: %h, o_wb_data: %h", i_mem_to_reg, i_alu_result, i_mem_result, o_wb_data);
-
-        // Test case 2: Different memory result, select memory result
+        // Test case 1: Different ALU result, select ALU result
         i_mem_to_reg = 1;
         i_alu_result = 32'h12345678;
         i_mem_result = 32'h87654321;
         #10;
-        $display("i_mem_to_reg: %b, i_alu_result: %h, i_mem_result: %h, o_wb_data: %h", i_mem_to_reg, i_alu_result, i_mem_result, o_wb_data);
+        if (o_wb_data === 32'h12345678)
+            $display("TEST 1 OK: i_mem_to_reg: %b, i_alu_result: %h, i_mem_result: %h, o_wb_data: %h", i_mem_to_reg, i_alu_result, i_mem_result, o_wb_data);
+        else
+            $display("TEST 1 FAILED: i_mem_to_reg: %b, i_alu_result: %h, i_mem_result: %h, o_wb_data: %h", i_mem_to_reg, i_alu_result, i_mem_result, o_wb_data);
+
+        // Test case 2: Different memory result, select memory result
+        i_mem_to_reg = 0;
+        i_alu_result = 32'h12345678;
+        i_mem_result = 32'h87654321;
+        #10;
+        if (o_wb_data === 32'h87654321)
+            $display("TEST 2 OK: i_mem_to_reg: %b, i_alu_result: %h, i_mem_result: %h, o_wb_data: %h", i_mem_to_reg, i_alu_result, i_mem_result, o_wb_data);
+        else
+            $display("TEST 2 FAILED: i_mem_to_reg: %b, i_alu_result: %h, i_mem_result: %h, o_wb_data: %h", i_mem_to_reg, i_alu_result, i_mem_result, o_wb_data);
 
         // Test case 3: Select ALU result
-        i_mem_to_reg = 0;
+        i_mem_to_reg = 1;
         i_alu_result = 32'h00000000;
         i_mem_result = 32'hFFFFFFFF;
         #10;
-        $display("i_mem_to_reg: %b, i_alu_result: %h, i_mem_result: %h, o_wb_data: %h", i_mem_to_reg, i_alu_result, i_mem_result, o_wb_data);
+        if (o_wb_data === 32'h00000000)
+            $display("TEST 3 OK: i_mem_to_reg: %b, i_alu_result: %h, i_mem_result: %h, o_wb_data: %h", i_mem_to_reg, i_alu_result, i_mem_result, o_wb_data);
+        else
+            $display("TEST 3 FAILED: i_mem_to_reg: %b, i_alu_result: %h, i_mem_result: %h, o_wb_data: %h", i_mem_to_reg, i_alu_result, i_mem_result, o_wb_data);
 
         $stop;
     end

@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module id_tb;
+module tb_id;
 
     localparam REGISTER_BANK_SIZE = 32;
     localparam PC_SIZE = 32;
@@ -115,6 +115,10 @@ module id_tb;
         i_next_seq_pc = 32'h00000004;
         #10;
 
+        // Display important values
+        $display("TEST 1 - ADD Instruction");
+        $display("o_opp: %b, o_rs: %b, o_rt: %b, o_rd: %b, o_funct: %b", o_opp, o_rs, o_rt, o_rd, o_funct);
+
         if (o_opp === 6'b000000 && o_rs === 5'b00001 && o_rt === 5'b00010 && o_rd === 5'b00011 && o_funct === 6'b100000) begin
             $display("TEST 1 OK");
         end else begin
@@ -125,6 +129,10 @@ module id_tb;
         i_instruction = 32'b000100_00001_00010_0000000000000100; // BEQ $1, $2, offset=4
         #10;
 
+        // Display important values
+        $display("TEST 2 - BEQ Instruction");
+        $display("o_opp: %b, o_rs: %b, o_rt: %b, o_inm_ext_signed: %b", o_opp, o_rs, o_rt, o_inm_ext_signed);
+
         if (o_opp === 6'b000100 && o_rs === 5'b00001 && o_rt === 5'b00010 && o_inm_ext_signed === 32'h00000004) begin
             $display("TEST 2 OK");
         end else begin
@@ -134,6 +142,10 @@ module id_tb;
         // Test 3: J instruction
         i_instruction = 32'b000010_00000000000000000000000001; // J address=1
         #10;
+
+        // Display important values
+        $display("TEST 3 - J Instruction");
+        $display("o_opp: %b, o_next_not_seq_pc: %b", o_opp, o_next_not_seq_pc);
 
         if (o_opp === 6'b000010 && o_next_not_seq_pc === 32'h00000004) begin
             $display("TEST 3 OK");

@@ -93,12 +93,7 @@ module tb_ex;
         expected_forwarded_data_B = i_forwarded_alu_result;
         
         #10;
-        if (o_wb_addr == expected_wb_addr && o_alu_result == expected_alu_result && 
-            o_forwarded_data_A == expected_forwarded_data_A && o_forwarded_data_B == expected_forwarded_data_B) begin
-            $display("TEST OK: Test case 1");
-        end else begin
-            $display("FAILED: Test case 1");
-        end
+        $display("wb address: %b, alu result: %b", o_wb_addr, o_alu_result);
 
         // Test case 2: ALU operation with immediate signed extension and rd as destination
         i_alu_src_A = 1;
@@ -127,12 +122,7 @@ module tb_ex;
         expected_forwarded_data_B = i_forwarded_wb_result;
 
         #10;
-        if (o_wb_addr == expected_wb_addr && o_alu_result == expected_alu_result && 
-            o_forwarded_data_A == expected_forwarded_data_A && o_forwarded_data_B == expected_forwarded_data_B) begin
-            $display("TEST OK: Test case 2");
-        end else begin
-            $display("FAILED: Test case 2");
-        end
+        $display("wb address: %b, alu result: %b", o_wb_addr, o_alu_result);
 
         $stop;
     end

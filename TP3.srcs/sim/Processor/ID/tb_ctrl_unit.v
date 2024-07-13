@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module ctrl_register_tb;
+module tb_ctrl_register;
 
 
     reg i_are_equal;
