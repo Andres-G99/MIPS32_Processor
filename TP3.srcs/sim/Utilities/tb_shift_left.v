@@ -23,26 +23,46 @@ module tb_shift_left;
         i_value = 32'b0000_0000_0000_0000_0000_0000_0000_0001; // 1
         #10;
         $display("Input: %b, Shifted: %b", i_value, o_shifted);
+        if (o_shifted === (i_value << POS_TO_SHIFT))
+            $display("TEST 1 OK");
+        else
+            $display("TEST 1 FAILED");
 
         // Test case 2: Simple value
         i_value = 32'b0000_0000_0000_0000_0000_0000_0000_0010; // 2
         #10;
         $display("Input: %b, Shifted: %b", i_value, o_shifted);
+        if (o_shifted === (i_value << POS_TO_SHIFT))
+            $display("TEST 2 OK");
+        else
+            $display("TEST 2 FAILED");
 
         // Test case 3: A larger value
         i_value = 32'b0000_0000_0000_0000_1111_1111_1111_1111; // 65535
         #10;
         $display("Input: %b, Shifted: %b", i_value, o_shifted);
+        if (o_shifted === (i_value << POS_TO_SHIFT))
+            $display("TEST 3 OK");
+        else
+            $display("TEST 3 FAILED");
 
         // Test case 4: All bits set to 1
         i_value = 32'b1111_1111_1111_1111_1111_1111_1111_1111; // 0xFFFFFFFF
         #10;
         $display("Input: %b, Shifted: %b", i_value, o_shifted);
+        if (o_shifted === (i_value << POS_TO_SHIFT))
+            $display("TEST 4 OK");
+        else
+            $display("TEST 4 FAILED");
 
         // Test case 5: All bits set to 0
         i_value = 32'b0000_0000_0000_0000_0000_0000_0000_0000; // 0
         #10;
         $display("Input: %b, Shifted: %b", i_value, o_shifted);
+        if (o_shifted === (i_value << POS_TO_SHIFT))
+            $display("TEST 5 OK");
+        else
+            $display("TEST 5 FAILED");
 
         $stop;
     end
