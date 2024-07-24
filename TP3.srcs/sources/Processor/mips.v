@@ -337,21 +337,21 @@ module mips
     );
 
     // --------------------------- MEM Unit ---------------------------
-    MEM_Unit
+    mem
     #(
-        .BUS_WIDTH   (DATA_BUS_SIZE),
-        .ADDRESS_WIDTH (DATA_MEMORY_ADDR_SIZE)
+        .IO_BUS_SIZE   (DATA_BUS_SIZE),
+        .MEM_ADDR_SIZE (DATA_MEMORY_ADDR_SIZE)
     )
     mem_unit
     (
         .i_clk         (i_clk),
         .i_reset       (i_reset),
         .i_flush       (i_flush),
-        .i_wr_rd   (i_mem_mem_wr_rd),
-        .i_wr_src  (i_mem_mem_wr_src),
-        .i_rd_src  (i_mem_mem_rd_src),
-        .i_mem_address    (i_mem_wb_alu_res[DATA_MEMORY_ADDR_SIZE - 1 : 0]),
-        .i_data_b       (i_mem_bus_b),
+        .i_mem_wr_rd   (i_mem_mem_wr_rd),
+        .i_mem_wr_src  (i_mem_mem_wr_src),
+        .i_mem_rd_src  (i_mem_mem_rd_src),
+        .i_mem_addr    (i_mem_wb_alu_res[DATA_MEMORY_ADDR_SIZE - 1 : 0]),
+        .i_bus_b       (i_mem_bus_b),
         .o_mem_rd      (o_mem_mem_rd),
         .o_bus_debug   (o_mem_data)
     );
