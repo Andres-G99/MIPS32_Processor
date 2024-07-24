@@ -46,24 +46,24 @@ module top
 
     uart
     #(
-      .DATA_BITS (UART_DATA_BITS),
-      .SB_TICKS  (UART_SB_TICKS),
-      .DVSR_BIT  (UART_DVSR_BIT),
-      .DVSR      (UART_DVSR),
+      .BITS_DATA (UART_DATA_BITS),
+      .SB_TICK  (UART_SB_TICKS),
+      .COUNTER_BITS  (UART_DVSR_BIT),
+      .COUNTER_MOD      (UART_DVSR),
       .FIFO_SIZE (UART_FIFO_SIZE)
     )
     uart_unit
     (
-      .clk          (i_clk),
-      .reset        (i_reset),
-      .rd_uart      (uart_rd),
-      .wr_uart      (uart_wr),
-      .rx           (i_rx),
-      .w_data       (uart_data_wr),
-      .tx_full      (uart_tx_full),
-      .rx_empty     (uart_rx_empty),
-      .tx           (o_tx),
-      .r_data       (uart_data_rd)
+      .i_clk          (i_clk),
+      .i_reset        (i_reset),
+      .i_read_uart      (uart_rd),
+      .i_write_uart      (uart_wr),
+      .i_uart_rx           (i_rx),
+      .i_data_to_write       (uart_data_wr),
+      .o_tx_full      (uart_tx_full),
+      .o_rx_empty     (uart_rx_empty),
+      .o_uart_tx           (o_tx),
+      .o_data_to_read       (uart_data_rd)
     );
 
 	debugger
