@@ -13,8 +13,8 @@ module MEM_Unit
         input wire [2:0] i_rd_src, //
         input wire [ADDRESS_WIDTH-1:0] i_mem_address,
         input wire [BUS_WIDTH-1:0] i_data_b,
-        output wire [BUS_WIDTH-1:0] o_mem_rd
-        // linea para debbug
+        output wire [BUS_WIDTH-1:0] o_mem_rd,
+        output wire [2**ADDRESS_WIDTH * BUS_WIDTH - 1 : 0] o_bus_debug
 
     );
 
@@ -63,7 +63,8 @@ module MEM_Unit
         .i_wr_rd(i_wr_rd),
         .i_address(i_mem_address),
         .i_data(mem_data_in),
-        .o_data(mem_data_out)
+        .o_data(mem_data_out),
+        .o_bus_debug (o_bus_debug)
     );
 
 // ------------------------------- Selectores -------------------------------
@@ -71,28 +72,28 @@ module MEM_Unit
     // Selector de fuente de lectura
     mux
     #(
-        .CHANNEL_NUM(3),
-        .DATA_WIDTH(BUS_WIDTH)
+        .CHANNELS(3),
+        .BUS_SIZE(BUS_WIDTH)
     )
     mux_rd_src
     (
         .selector(i_rd_src),
-        .i_data({data_b_unsig_ext_byte, data_b_unsig_ext_halfword, i_data_b}),
-        .o_data(mem_data_in)
+        .data_in({data_b_unsig_ext_byte, data_b_unsig_ext_halfword, i_data_b}),
+        .data_out(mem_data_in)
     ); // Selecciona la fuente de lectura: byte, halfword o word.
 
 
     // Selector de formato de salida (lectura de memoria)
     mux
     #(
-        .CHANNEL_NUM(5),
-        .DATA_WIDTH(BUS_WIDTH)
+        .CHANNELS(5),
+        .BUS_SIZE(BUS_WIDTH)
     )
     mux_out_mem
     (
         .selector(i_rd_src),
-        .i_data({out_data_unsig_ext_byte, out_data_unsig_ext_halfword, out_data_sig_ext_byte, out_data_sig_ext_byte, mem_data_out}),
-        .o_data(o_mem_rd)
+        .data_in({out_data_unsig_ext_byte, out_data_unsig_ext_halfword, out_data_sig_ext_byte, out_data_sig_ext_byte, mem_data_out}),
+        .data_out(o_mem_rd)
     ); // Selecciona el formato: byte sin signo extendido, halfword sin signo extendido, byte con signo extendido, halfword con signo extendido o word.
 
 // ------------------------------------------------------------------------------------
@@ -100,73 +101,79 @@ module MEM_Unit
 
 
 // ------------------------------- Extensores sin signo -------------------------------
-unsig_ext
+extend
 #(
-    .IN_WIDTH(HALFWORD_WIDTH),
-    .OUT_WIDTH(BUS_WIDTH)
+    .DATA_ORIGINAL_SIZE(HALFWORD_WIDTH),
+    .DATA_EXTENDED_SIZE(BUS_WIDTH)
 )
-unsig_ext_data_b_halfword // Extensor sin signo de halfword a word (entrada de la memoria)
+unsig_ext_data_b_halfword_u // Extensor sin signo de halfword a word (entrada de la memoria)
 (
-    .i_data(data_b_halfword),
-    .o_data(data_b_unsig_ext_halfword)
+    .i_value(data_b_halfword),
+    .i_is_signed(1'b0),
+    .o_extended_value(data_b_unsig_ext_halfword)
 );
 
-unsig_ext
+extend
 #(
-    .IN_WIDTH(BYTE_WIDTH),
-    .OUT_WIDTH(BUS_WIDTH)
+    .DATA_ORIGINAL_SIZE(BYTE_WIDTH),
+    .DATA_EXTENDED_SIZE(BUS_WIDTH)
 )
-unsig_ext_data_b_byte // Extensor sin signo de byte a word (entrada de la memoria)
+unsig_ext_data_b_byte_u // Extensor sin signo de byte a word (entrada de la memoria)
 (
-    .i_data(data_b_byte),
-    .o_data(data_b_unsig_ext_byte)
+    .i_value(data_b_byte),
+    .i_is_signed(1'b0),
+    .o_extended_value(data_b_unsig_ext_byte)
 );
 
-unsig_ext
+extend
 #(
-    .IN_WIDTH(HALFWORD_WIDTH),
-    .OUT_WIDTH(BUS_WIDTH)
+    .DATA_ORIGINAL_SIZE(HALFWORD_WIDTH),
+    .DATA_EXTENDED_SIZE(BUS_WIDTH)
 )
-unsig_ext_out_data_halfword // Extensor sin signo de halfword a word (salida de la memoria)
+unsig_ext_out_data_halfword_u // Extensor sin signo de halfword a word (salida de la memoria)
 (
-    .i_data(out_data_halfword),
-    .o_data(out_data_unsig_ext_halfword)
+    .i_value(out_data_halfword),
+    .i_is_signed(1'b0),
+    .o_extended_value(out_data_unsig_ext_halfword)
 );
 
-unsig_ext
+extend
 #(
-    .IN_WIDTH(BYTE_WIDTH),
-    .OUT_WIDTH(BUS_WIDTH)
+    .DATA_ORIGINAL_SIZE(BYTE_WIDTH),
+    .DATA_EXTENDED_SIZE(BUS_WIDTH)
 )
-unsig_ext_out_data_byte // Extensor sin signo de byte a word (salida de la memoria)
+unsig_ext_out_data_byte_u // Extensor sin signo de byte a word (salida de la memoria)
 (
-    .i_data(out_data_byte),
-    .o_data(out_data_unsig_ext_byte)
+    .i_value(out_data_byte),
+    .i_is_signed(1'b0),
+    .o_extended_value(out_data_unsig_ext_byte)
 );
 
 // ------------------------------------------------------------------------------------
 
 // ------------------------------- Extensores con signo -------------------------------
-sig_ext
+extend
 #(
-    .IN_WIDTH(HALFWORD_WIDTH),
-    .OUT_WIDTH(BUS_WIDTH)
+    .DATA_ORIGINAL_SIZE(HALFWORD_WIDTH),
+    .DATA_EXTENDED_SIZE(BUS_WIDTH)
 )
-sig_ext_out_data_halfword // Extensor con signo de halfword a word (salida de la memoria)
+sig_ext_out_data_halfword_u // Extensor con signo de halfword a word (salida de la memoria)
 (
-    .i_data(out_data_halfword),
-    .o_data(out_data_sig_ext_halfword)
+    .i_value(out_data_halfword),
+    .i_is_signed(1'b1),
+    .o_extended_value(out_data_sig_ext_halfword)
 );
 
-sig_ext
+extend
 #(
-    .IN_WIDTH(BYTE_WIDTH),
-    .OUT_WIDTH(BUS_WIDTH)
+    .DATA_ORIGINAL_SIZE(BYTE_WIDTH),
+    .DATA_EXTENDED_SIZE(BUS_WIDTH)
 )
-sig_ext_out_data_byte // Extensor con signo de byte a word (salida de la memoria)
+sig_ext_out_data_byte_u // Extensor con signo de byte a word (salida de la memoria)
 (
-    .i_data(out_data_byte),
-    .o_data(out_data_sig_ext_byte)
+    .i_value(out_data_byte),
+    .i_is_signed(1'b1),
+    .o_extended_value(out_data_sig_ext_byte)
 );
 // ------------------------------------------------------------------------------------
 
