@@ -1,50 +1,45 @@
 `timescale 1ns / 1ps
 
-
-module IF_ID_sreg
+module if_id
     #(
-        parameter PC_WIDTH = 32,
-        parameter INSTRUC_WIDTH = 32
+        parameter PC_SIZE          = 32,
+        parameter INSTRUCTION_SIZE = 32
     )
     (
-        input wire i_clk, // Clock
-        input wire i_reset, // Reset
-        input wire i_enable, // Enable
-        input wire i_flush, 
-        input wire i_halt,
-        input wire [PC_WIDTH-1:0] i_next_pc_sq, // PC siguiente en modo secuencial
-        //input wire [PC_WIDTH-1:0] i_next_pc_br, // PC siguiente en modo branch
-        input wire [INSTRUC_WIDTH-1:0] i_instruction, // Instrucción
-
-        output wire [PC_WIDTH-1:0] o_next_pc_sq, // PC
-        output wire [INSTRUC_WIDTH-1:0] o_instruction, // Instrucción
-        output wire o_halt
+        input  wire                            i_clk,
+        input  wire                            i_reset,
+        input  wire                            i_enable,
+        input  wire                            i_flush,
+        input  wire                            i_halt,
+        input  wire [PC_SIZE - 1 : 0]          i_next_seq_pc,
+        input  wire [INSTRUCTION_SIZE - 1 : 0] i_instruction,
+        output wire                            o_halt,
+        output wire [PC_SIZE - 1 : 0]          o_next_seq_pc,
+        output wire [INSTRUCTION_SIZE - 1 : 0] o_instruction
     );
 
-    // Registers
-    reg [PC_WIDTH-1:0] next_pc_sq;
-    reg [INSTRUC_WIDTH-1:0] instruction;
-    reg halt;
+    reg [PC_SIZE - 1 : 0]          next_seq_pc;
+    reg [INSTRUCTION_SIZE - 1 : 0] instruction;
+    reg                            halt;
 
-    // state machine
-    always @(posedge i_clk)
+    always @(posedge i_clk) 
     begin
-        if(i_reset || i_flush) // Si reset o flush se limpian los registros
-        begin
-            next_pc_sq <= 0; 
-            instruction <= 0;
-            halt <= 0;
-        end
-        else if(i_enable) // Si enable se actualizan los registros
-        begin
-            next_pc_sq <= i_next_pc_sq;
-            instruction <= i_instruction;
-            halt <= i_halt;
-        end
+        if (i_reset || i_flush)
+            begin
+                next_seq_pc <= 'b0;
+                instruction <= 'b0;
+                halt        <= 1'b0;
+            end
+        else if (i_enable)
+            begin
+                next_seq_pc <= i_next_seq_pc;
+                instruction <= i_instruction;
+                halt        <= i_halt;
+            end
     end
 
-    assign o_next_pc_sq = next_pc_sq;
+    assign o_next_seq_pc = next_seq_pc;
     assign o_instruction = instruction;
-    assign o_halt = halt;
+    assign o_halt        = halt;
 
 endmodule
