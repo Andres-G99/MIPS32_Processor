@@ -1,8 +1,6 @@
 
 `timescale 1ns / 1ps
 
-`include "if.vh"
-
 module _if
     #(
         //parameter PC_SIZE            = `DEFAULT_PC_SIZE,
@@ -64,7 +62,7 @@ module _if
 
     pc 
     #(
-        .PC_WIDTH(`ARQUITECTURE_BITS)
+        .PC_WIDTH(PC_SIZE)
     ) 
     pc_unit 
     (
