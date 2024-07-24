@@ -1,75 +1,83 @@
 `timescale 1ns / 1ps
 
-module PC
-   #(
-    parameter PC_WIDTH = 32, // Tamaño del PC
-    parameter PC_STATES_NUM = 3, // Número de estados del PC
+module pc
+    #(
+        parameter PC_WIDTH = 32, // Tamaño del PC
+        parameter PC_STATES_NUM = 3, // Número de estados del PC
+        parameter STATES_WIDTH = $clog2(PC_STATES_NUM), // Tamaño del estado
     
-    //PC states
-    parameter PC_IDLE = 2'b00, // Estado de espera
-    parameter PC_NEXT = 2'b01, // Estado de cambio de PC
-    parameter PC_END = 2'b10 // Estado de fin de ejecución
+        //PC states
+        parameter PC_IDLE = 2'b00, // Estado de espera
+        parameter PC_NEXT = 2'b01, // Estado de cambio de PC
+        parameter PC_END = 2'b10 // Estado de fin de ejecución
     )
     (
-    input wire i_clk, // Señal de clock
-    input wire i_reset, // Señal de reset
-    input wire i_halt, // Señal de halt
-    /*
-    Quedan definir mas señales
-    */
-    
-    input wire [PC_WIDTH-1:0] i_pc_next, // Siguiente dirección de PC
-    output wire [PC_WIDTH-1:0] o_pc // Valor del PC (salida)
+        input  wire                   i_clk, 
+        input  wire                   i_reset,
+        input  wire                   i_halt,
+        input  wire                   i_not_load,
+        input  wire                   i_enable,
+        input  wire                   i_flush,
+        input  wire                   i_clear,                        
+        input  wire [PC_WIDTH - 1 : 0] i_next_pc,
+        output wire [PC_WIDTH - 1 : 0] o_pc
     );
-    
-    reg [PC_STATES_NUM-1:0] state, state_next; // Estados del PC
-    reg [PC_WIDTH-1:0] pc, pc_next; // Valores del PC
-    
-    always @ (posedge i_clk) 
+
+    reg [STATES_WIDTH - 1 : 0] state, state_next; 
+    reg [PC_WIDTH - 1 : 0] pc, pc_next;
+
+    always @ (negedge i_clk) // 
     begin
-        if(i_reset) // Si se activa la señal de reset, se reinicia el PC
+        if(i_reset || i_flush || i_clear) // si hay reset, flush o clear, se limpia el PC
             begin
                 state <= PC_IDLE;
-                pc <= CLEAR(PC_WIDTH);
+                pc    <= 32'b0;
             end
-        else // Si no se activa la señal de reset, se actualiza el PC (o no) según el estado
+        else
             begin
                 state <= state_next;
-                pc <= pc_next;
+                pc    <= pc_next;
             end
     end
-    
-    always @ (*) // Máquina de estados del PC
+
+    always @ (*) 
     begin
-        state_next = state; // Valor default
-        pc_next = pc; // Valor default
+        state_next = state;
+        pc_next    = pc;
 
         case(state)
             PC_IDLE: // Estado de espera
                 begin
-                    if(i_halt) // Si se activa la señal de halt, se detiene el PC
-                        state_next = PC_END;
-                    else
-                        state_next = PC_NEXT;
+                    pc_next    = 32'b0;
+                    state_next = PC_NEXT;
                 end
+
             PC_NEXT: // Estado de cambio de PC
                 begin
-                    if(i_halt) // Si se activa la señal de halt, se detiene el PC
-                        state_next = PC_END;
-                    else
-                        state_next = PC_IDLE;
-                        pc_next = i_pc_next;
+                    if (i_enable) 
+                        begin
+                            if(i_halt) // si hay halt, se termina la ejecución
+                                state_next = PC_END;
+                            else 
+                                begin
+                                    if(~i_not_load)
+                                        begin
+                                            pc_next    = i_next_pc;
+                                            state_next = PC_NEXT;
+                                        end
+                                end
+                        end
                 end
-            PC_END: // Estado de fin de ejecución
-                begin
-                    if(i_reset && ~i_halt) // Si se activa la señal de reset y no se activa la señal de halt, se reinicia el PC
-                        state_next = PC_IDLE;
-                    else
-                        state_next = PC_END;
-                end
+
+            PC_END:
+            begin
+                if(~i_halt) // si no hay halt, se vuelve al estado de espera
+                    state_next = PC_IDLE;
+            end
+
         endcase
     end
-    
+
     assign o_pc = pc;
-    
+
 endmodule
