@@ -1,14 +1,20 @@
-from pyASM import *
+from pyASM import pyASM
 
 def main():
     file = input_file("test.asm")
-    try:
-        asm = pyASM()
-        asm.assamble(file)
-    except Exception as e:
-        print(e)
-        print("\nCompilation failed...")
-        exit(1)
+    #print(file)
+
+    asm = pyASM()
+    asm.assamble(file)
+
+    #try:
+        #asm = pyASM()
+        #asm.assamble(file)
+    #    pass
+    #except Exception as e:
+    #    print(e)
+    #    print("\nCompilation failed...")
+    #    exit(1)
 
 
 
