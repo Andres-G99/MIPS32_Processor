@@ -46,7 +46,6 @@ class pyASM():
             mach_code = self.resolve_arguments(inst_parts)
             #print(mach_code)
             self.instructions_machine_code.append(mach_code)
-            
         else:
             #print("No arg instruction" + str(inst_parts))
             pass
@@ -101,15 +100,38 @@ class pyASM():
                 print("RD: " + rd)
                 machine_code = self.instruction_set[inst[0]][0] + rs + rt + rd + shamt + func
                 return machine_code
-            
-            elif (inst[0] != 'JALR' or inst[0] != 'JR'):
-                # Rd = Rs + Rt; Shamt = 0x00
-                args_list = [args[0], args[2], args[1], '0'] # rd, rs, rt, shamt
-                machine_code = self.machine_code('R', inst[0], args_list)
+        
+            else: #From ADDU to SLT
+                # XXXX $rd, $rs, $rt
+                rs = self.to_register(args[1])
+                rt = self.to_register(args[2])
+                rd = self.to_register(args[0])
+                shamt = self.dec_to_bin(0, 5)
+                func = self.instruction_set[inst[0]][5]
+                machine_code = self.instruction_set[inst[0]][0] + rs + rt + rd + shamt + func
                 return machine_code
-            else:
-                print("Invalid instruction")
-                pass
+        else:
+            if inst[0] == 'JALR': #rd = R31 = PC + 4; rs = PC 
+                # JARL $rs
+                rs = self.to_register(args[0])
+                rt = self.dec_to_bin(0, 5)
+                rd = self.dec_to_bin(31, 5) # R31
+                shamt = self.dec_to_bin(0, 5)
+                func = self.instruction_set[inst[0]][5]
+                machine_code = self.instruction_set[inst[0]][0] + rs + rt + rd + shamt + func
+                print(machine_code)
+                return machine_code
+            
+            elif inst[0] == 'JR': #PC = Rs
+                # JR $rs
+                rs = self.to_register(args[0])
+                rt = self.dec_to_bin(0, 5)
+                rd = self.dec_to_bin(0, 5)
+                shamt = self.dec_to_bin(0, 5)
+                func = self.instruction_set[inst[0]][5]
+                machine_code = self.instruction_set[inst[0]][0] + rs + rt + rd + shamt + func
+                return machine_code
+            return
                 
                 
             
