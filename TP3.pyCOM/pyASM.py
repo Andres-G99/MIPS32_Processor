@@ -44,7 +44,6 @@ class pyASM():
 
         if len(inst_parts) > 1:
             mach_code = self.resolve_arguments(inst_parts)
-            #print(mach_code)
             self.instructions_machine_code.append(mach_code)
         else:
             #print("No arg instruction" + str(inst_parts))
@@ -65,14 +64,14 @@ class pyASM():
 
     def resolve_arguments(self, inst: str) -> str:
         if inst[0] in self.instruction_set:
-            #print("Instruction: " + str(inst))
-            if self.instruction_set[inst[0]][0] == str(iset.OP_CODE_R):
+        
+            if self.instruction_set[inst[0]][0] == str(iset.OP_CODE_R): # R type instruction
                 #print("R type instruction: " + str(inst))
                 mach_code_r_type = self.resolve_R_type(inst)
                 return mach_code_r_type
-            else:
-                #print("X")
-                pass
+            elif (self.instruction_set[inst[0]][0] == str(iset.OP_CODE_J) or self.instruction_set[inst[0]][0] == str(iset.OP_CODE_JAL)): # J type instruction
+                mach_code_j_type = self.resolve_J_type(inst)
+                return mach_code_j_type
 
     def resolve_R_type(self, inst: str) -> str:
         args = inst[1].split(',')
@@ -131,7 +130,14 @@ class pyASM():
                 func = self.instruction_set[inst[0]][5]
                 machine_code = self.instruction_set[inst[0]][0] + rs + rt + rd + shamt + func
                 return machine_code
-            return
+            
+    def resolve_J_type(self, inst: str) -> str:
+        if inst[0] == 'J':
+            # J DIR
+            if inst[1] in self.labels_address_table:
+                dir = self.labels_address_table[inst[1]]
+                machine_code = self.instruction_set[inst[0]][0] + dir
+                return machine_code
                 
                 
             
