@@ -1,21 +1,25 @@
 from pyASM import pyASM
 
 def main():
-    file = input_file("test2.asm")
+    file = input_file("test3.asm")
     #print(file)
 
     asm = pyASM()
-    asm.assamble(file)
+    if asm.validate_asm_code(file) == True:
+        print("Syntaxis OK!")
+        asm.assamble(file)
+'''
+    try:
+        asm = pyASM()
+        if asm.validate_asm_code(file) == True:
+            print("Syntaxis OK!")
+            asm.assamble(file)
 
-    #try:
-        #asm = pyASM()
-        #asm.assamble(file)
-    #    pass
-    #except Exception as e:
-    #    print(e)
-    #    print("\nCompilation failed...")
-    #    exit(1)
-
+    except Exception as e:
+        print(e)
+        print("\nCompilation failed...")
+        exit(1)
+'''
 
 
 
