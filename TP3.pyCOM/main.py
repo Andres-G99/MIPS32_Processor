@@ -1,7 +1,7 @@
 from pyASM import pyASM
 
 def main():
-    file = input_file("test3.asm")
+    file = input_file("tester.asm")
     #print(file)
 
     asm = pyASM()

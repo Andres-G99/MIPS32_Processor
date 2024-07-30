@@ -9,6 +9,7 @@ class pyASM():
     current_address = 0
     register_table = {}
     current_line = None
+    variables_table = {}
 
     def __init__(self):
         self.labels_address_table = {}
@@ -16,14 +17,19 @@ class pyASM():
         self.register_table = iset.registerTable
         self.instructions_asm = []
         self.instructions_machine_code = []
+        self.variables_table = {}
         self.current_address = 0
         self.current_line = 1
 
     def validate_asm_code(self, input: str) -> bool:
         lines = input.split('\n')
+        lines = [line.strip() for line in lines if line != '']
+        #print(lines)
         # Split input string into lines
         for line in lines:
-            if not line.startswith("#"): # Check if line is a comment
+            if line.startswith("DEFINE"):
+                self.get_variables(line)
+            if not line.startswith("#") and not line.startswith("DEFINE"): # Check if line is a comment
                 self.instructions_asm.append(line)
         if self.validate_operation():
             print("OPCODES and LABELS Syntax OK!")
@@ -38,20 +44,21 @@ class pyASM():
         
 
     def assamble(self, input: str) -> str:
+        self.current_address = 0
+        self.current_line = 1
         for line in self.instructions_asm:
             inst = line.split(' ')
             inst = [item.strip() for item in inst if item != '']
             #print(self.labels_address_table)
             machine_code = self.resolve_instruction(inst)
-            self.instructions_machine_code.append(machine_code)
             #print(machine_code)
-            print(self.bin_to_hex(machine_code))
+            self.instructions_machine_code.append(machine_code)
+            print(str(hex(self.current_address*4)) + ": " + self.bin_to_hex(machine_code) + "  " + str(inst))
+            self.current_address += 1
+            self.current_line += 1
 
-    
-    def translate_line(self, line: str) -> str:
-        pass
-
-        
+            
+            #print(self.bin_to_hex(machine_code))
 
     
     def validate_operation(self) -> bool:
@@ -65,7 +72,7 @@ class pyASM():
                 if ':' in inst_parts[0]:
                     #print("Label: " + inst_parts[0])
                     inst_parts[0] = inst_parts[0].replace(':', '')
-                    self.labels_address_table[inst_parts[0]] = self.dec_to_bin(self.current_address, 26)
+                    self.labels_address_table[inst_parts[0]] = self.current_address
                     self.current_line += 1
                 else:
                     raise Invalid_instruction_exception("Invalid instruction on line " + str(self.line_index) + ": " + inst_parts[0])
@@ -87,7 +94,7 @@ class pyASM():
                 args = inst[1].split(',')
                 if len(args) == 1:
                     #print("Label: " + args[0])
-                    if args[0] not in self.labels_address_table:
+                    if args[0] not in self.labels_address_table and args[0] not in self.variables_table and args[0] not in self.register_table:
                         raise Label_not_found_exception("Label not found on line " + str(self.current_line) + ": " + args[0])
                         #print("Label not found on line " + str(self.current_line) + ": " + args[0])
             self.current_line += 1
@@ -95,7 +102,6 @@ class pyASM():
                 
     
     def resolve_instruction(self, inst: str) -> str:
-        #print(inst)
         if inst[0] in self.instruction_set:
             if self.instruction_set[inst[0]][0] == str(iset.OP_CODE_R): # R type instruction
                 #print("R type instruction: " + str(inst))
@@ -105,8 +111,7 @@ class pyASM():
                 mach_code_j_type = self.resolve_J_type(inst)
                 return mach_code_j_type
             elif inst[0] == 'NOP' or inst[0] == 'HALT':
-                
-                return self.hex_to_bin(self.instruction_set[inst[0]][0], 32)
+                return self.translate_to_bin(self.instruction_set[inst[0]][0], 32)
             else: # I type instruction
                 mach_code_i_type = self.resolve_I_type(inst)
                 return mach_code_i_type
@@ -116,10 +121,10 @@ class pyASM():
                 inst_label = [inst[1], inst[2]]
                 label_mach_code = self.resolve_instruction(inst_label)
                 return label_mach_code
+                
 
     def resolve_R_type(self, inst: str) -> str:
         args = inst[1].split(',')
-        #print(args)
         if len(args) == 3:
             if (inst[0] == 'SLL' or inst[0] == 'SRL' or inst[0] == 'SRA'):
                 # XXXX $rd, $rt, shamt
@@ -133,36 +138,32 @@ class pyASM():
             
             elif (inst[0] == 'SLLV' or inst[0] == 'SRLV' or inst[0] == 'SRAV'):
                 # XXXX $rd, $rt, $rs
-                rs = self.to_register(args[2])
-                rt = self.to_register(args[1])
                 rd = self.to_register(args[0])
+                rt = self.to_register(args[1])
+                rs = self.to_register(args[2])
                 shamt = self.dec_to_bin(0, 5)
                 func = self.instruction_set[inst[0]][5]
-                print("RS: " + rs)
-                print("RT: " + rt)
-                print("RD: " + rd)
                 machine_code = self.instruction_set[inst[0]][0] + rs + rt + rd + shamt + func
                 return machine_code
         
             else: #From ADDU to SLT
                 # XXXX $rd, $rs, $rt
+                rd = self.to_register(args[0])
                 rs = self.to_register(args[1])
                 rt = self.to_register(args[2])
-                rd = self.to_register(args[0])
                 shamt = self.dec_to_bin(0, 5)
                 func = self.instruction_set[inst[0]][5]
                 machine_code = self.instruction_set[inst[0]][0] + rs + rt + rd + shamt + func
                 return machine_code
         else:
             if inst[0] == 'JALR': #rd = R31 = PC + 4; rs = PC 
-                # JARL $rs
-                rs = self.to_register(args[0])
+                # JARL $rd, $rs
+                rd = self.to_register(args[0])
+                rs = self.to_register(args[1])
                 rt = self.dec_to_bin(0, 5)
-                rd = self.dec_to_bin(31, 5) # R31
                 shamt = self.dec_to_bin(0, 5)
                 func = self.instruction_set[inst[0]][5]
                 machine_code = self.instruction_set[inst[0]][0] + rs + rt + rd + shamt + func
-                print(machine_code)
                 return machine_code
             
             elif inst[0] == 'JR': #PC = Rs
@@ -179,32 +180,66 @@ class pyASM():
         if inst[0] == 'J':
             # J DIR
             if inst[1] in self.labels_address_table:
-                dir = self.labels_address_table[inst[1]]
-                machine_code = self.instruction_set[inst[0]][0] + dir
-                return machine_code
+                dir = self.translate_to_bin(str(self.labels_address_table[inst[1]]), 26)
+            else:
+                dir = self.translate_to_bin(inst[1], 26)
+            machine_code = self.instruction_set[inst[0]][0] + dir
+            return machine_code
+        if inst[0] == 'JAL':
+            # JAL DIR
+            if inst[1] in self.labels_address_table:
+                dir = self.translate_to_bin(str(self.labels_address_table[inst[1]]), 26)
+            else:
+                dir = self.translate_to_bin(inst[1], 26)
+            machine_code = self.instruction_set[inst[0]][0] + dir
+            return machine_code
                 
     def resolve_I_type(self, inst: str) -> str:
-        return None   
+        args = inst[1].split(',')
+        #print("I-type: " + str(args))
+        if inst[0] == 'BNE' or inst[0] == 'BEQ':
+            # BXX $rs, $rt, INM
+            rs = self.to_register(args[0])
+            rt = self.to_register(args[1])
+            dir_src = self.bin_rezise(str(self.current_address), 16)
+            if args[2] in self.labels_address_table:
+                dir_dest = self.bin_rezise(str(self.labels_address_table[args[2]]), 16)
+            else:
+                dir_dest = self.translate_to_bin(args[2], 16)
+            inm = self.calculate_offset(dir_dest, dir_src)
+            return self.instruction_set[inst[0]][0] + rs + rt + inm
+        
+        if inst[0] in iset.load_and_store_inst: # XXXX $rt, INM($rs)
+            opcode = self.instruction_set[inst[0]][0]
+            rt = self.to_register(args[0])
+            inm, rs = self.get_reg_and_offset(args[1])
+            return opcode + rs + rt + inm
+        
+        if inst[0] == 'LUI': # LUI $rt, INM
+            opcode = self.instruction_set[inst[0]][0]
+            rt = self.to_register(args[0])
+            inm = self.translate_to_bin(args[1], 16)
+            return opcode + self.dec_to_bin(0, 5) + rt + inm
+        else:# XXXX $rt, $rs, INM
+            opcode = self.instruction_set[inst[0]][0]
+            rt = self.to_register(args[0])
+            rs = self.to_register(args[1])
+            inm = self.translate_to_bin(args[2], 16)
+            return opcode + rs + rt + inm
+
 
   
             
-    def machine_code(self, type: str, inst: str, args: str) -> str:
-        if type == 'R':
-            pass
-        elif type == 'I':     
-            pass
-        elif type == 'J':
-            pass
+    def calculate_offset(self, dest: str, src: str) -> str:
+        offset = int(dest, 16) - (int(src, 16) + 1) # + 1 porque se calcula el offset con respecto a la siguiente instrucción
+        if offset < -32768 or offset > 32767:
+            raise ValueError("Offset out of range")
+        return self.dec_to_bin(offset, 16)
 
-    #def resolve_label(self, label: str) -> str:
-    #    label = label.replace(':', '')
-    #    self.labels_address_table[label] = None
-    #    print(self.labels_address_table)
 
     # Hexadecimal to binary
     def hex_to_bin(self, hexnum: str, size: int) -> str:
         intnum = int(hexnum, 16)
-        
         binnum = bin(intnum)[2:]
         binnum_filled = binnum.zfill(size)
         return binnum_filled
@@ -218,22 +253,106 @@ class pyASM():
         hexnum_32 = hexnum.zfill(8)
         return '0x' + hexnum_32
         
-        return hexnum
     
-    def dec_to_bin(self, num: int, size: int) -> int:
+    def dec_to_bin(self, num: str, size: int) -> int:
+        num = int(num)
         if num < 0:
             bin = format((1 << size) + num, '0{}b'.format(size))
         else:
             bin = format(num, '0{}b'.format(size))
-
-        #print(bin)
         return bin
+    
+    def Ob_to_bin(self, num: str, size: int) -> str:
+        num_int = int(num, 2)
+        bin_str = format(num_int, '0{}b'.format(size))
+        return bin_str
 
     def to_register(self, reg: str) -> str:
         if reg in self.register_table:
             return self.dec_to_bin(self.register_table[reg], 5)
         else:
             raise Invalid_reg_exception("Invalid register on line " + str(self.current_line) + ": " + reg)
+    
+    def bin_rezise(self, binum: str, size: int) -> str:
+        if len(binum) < size:
+            binum_filled = binum.zfill(size)
+            return binum_filled
+        elif len(binum) > size:
+            binum_resized = binum[-size:]
+            return binum_resized
+
+    # Extraer el registro y el offset de una cadena de texto. Formato: offset(registro)
+    def get_reg_and_offset(self, reg: str) -> (str, str):
+        match = re.match(r'([0-9]+|0x[0-9a-fA-F]+|0b[01]+|\w+)\((\w+)\)', reg)
+        if match:
+            inm = match.group(1)
+            rx = match.group(2)
+            inm = self.translate_to_bin(inm, 16)
+            rx = self.to_register(rx)
+            return inm, rx
+        else:
+            raise ValueError("El formato de entrada no es válido")
+
+    def get_variables(self, line: str) -> str:
+        parts = line.split('=')
+        if len(parts) != 2:
+            raise ValueError("Wrong format. Use: DEFINE [INT__] [NAME] = value")
+        # Obtener la parte antes del '=' y dividirla por espacios
+        left_part = parts[0].strip().split(' ')
+        
+        if len(left_part) != 3 or left_part[0] != "DEFINE":
+            raise ValueError("Wrong format. Use: DEFINE [INT__] [NAME] = value")
+        
+        int_type = left_part[1]
+        name = left_part[2]
+        value_str = parts[1].strip()
+        
+        # Validar tipo de entero
+        valid_types = ["INT8", "INT16", "INT32", "UINT8", "UINT16", "UINT32"]
+        if int_type not in valid_types:
+            raise ValueError("Invalid input, data types supported: " + ", ".join(valid_types))
+        
+        # Validar valor
+        if value_str.startswith("0x"): # Hexadecimal
+            try:
+                value = int(value_str, 16)
+            except ValueError:
+                raise ValueError("Invalid hexadecimal value")
+        elif value_str.startswith("0b"):# Binario
+            try:
+                value = int(value_str, 2)
+            except ValueError:
+                raise ValueError("Invalid binary value")
+        else: # Decimal
+            try:
+                value = int(value_str)
+            except ValueError:
+                raise ValueError("Invalid decimal value")
+        
+        # Verificar que el valor no exceda el tamaño de la variable
+        if int_type == "INT8" and not (-128 <= value <= 127):
+            raise ValueError("Value exceeds INT8 size")
+        elif int_type == "UINT8" and not (0 <= value <= 255):
+            raise ValueError("Value exceeds UINT8 size")
+        elif int_type == "INT16" and not (-32768 <= value <= 32767):
+            raise ValueError("Value exceeds INT16 size")
+        elif int_type == "UINT16" and not (0 <= value <= 65535):
+            raise ValueError("Value exceeds UINT16 size")
+        elif int_type == "INT32" and not (-2147483648 <= value <= 2147483647):
+            raise ValueError("Value exceeds INT32 size")
+        elif int_type == "UINT32" and not (0 <= value <= 4294967295):
+            raise ValueError("Value exceeds UINT32 size")
+        
+        # Imprimir o almacenar las variables extraídas
+        self.variables_table[name] = (int_type, value)
+    
+    def translate_to_bin(self, value: str, size: int) -> str:
+        if value.startswith("0x"):
+            return self.hex_to_bin(value, size)
+        elif value.startswith("0b"):
+            return self.Ob_to_bin(value, size)
+        else:
+            return self.dec_to_bin(value, size)
 
 class Invalid_instruction_exception(Exception):
     def __init__(self, msj):
@@ -246,6 +365,8 @@ class Invalid_reg_exception(Exception):
 class Label_not_found_exception(Exception):
     def __init__(self, msj):
         super().__init__(msj)
+
+
 
 if __name__ == '__main__':
     print("pyASM")

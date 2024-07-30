@@ -83,6 +83,8 @@ instructionTable = {
     'HALT' : [ '0xffffffff' ]  #Halt
 }
 
+load_and_store_inst = ['LB', 'LH', 'LW', 'LBU', 'LHU', 'SB', 'SH', 'SW', 'LWU']
+
 registerTable = {
     'r0'  : 0,
     'r1'  : 1,
