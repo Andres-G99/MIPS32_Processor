@@ -1,14 +1,14 @@
 from pyASM import pyASM
 
 def main():
-    file = input_file("tester.asm")
+    file = input_file("test2.asm")
     #print(file)
 
-    asm = pyASM()
-    if asm.validate_asm_code(file) == True:
-        print("Syntaxis OK!")
-        asm.assamble(file)
-'''
+    #asm = pyASM()
+    #if asm.validate_asm_code(file) == True:
+    #    print("Syntaxis OK!")
+    #    asm.assamble(file)
+
     try:
         asm = pyASM()
         if asm.validate_asm_code(file) == True:
@@ -19,7 +19,6 @@ def main():
         print(e)
         print("\nCompilation failed...")
         exit(1)
-'''
 
 
 

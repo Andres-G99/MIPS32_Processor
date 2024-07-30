@@ -2,14 +2,14 @@ import instruction_set as iset
 import re
 
 class pyASM():
-    labels_address_table = {}
-    instruction_set = {}
-    instructions_asm = []
-    instructions_machine_code = []
+    labels_address_table = {} # {label: address}
+    instruction_set = {} # Set of instructions
+    instructions_asm = [] # Instructions in assembly
+    instructions_machine_code = [] # Instructions in machine code
     current_address = 0
-    register_table = {}
+    register_table = {} # {register: address}
     current_line = None
-    variables_table = {}
+    variables_table = {} # {variable: (type, value)}
 
     def __init__(self):
         self.labels_address_table = {}
@@ -21,6 +21,7 @@ class pyASM():
         self.current_address = 0
         self.current_line = 1
 
+    # Validate the syntax of the assembly code
     def validate_asm_code(self, input: str) -> bool:
         lines = input.split('\n')
         lines = [line.strip() for line in lines if line != '']
@@ -42,7 +43,7 @@ class pyASM():
         else :
             return False
         
-
+    # Assemble the code
     def assamble(self, input: str) -> str:
         self.current_address = 0
         self.current_line = 1
@@ -57,10 +58,7 @@ class pyASM():
             self.current_address += 1
             self.current_line += 1
 
-            
-            #print(self.bin_to_hex(machine_code))
-
-    
+    # Validate the operation of the instructions
     def validate_operation(self) -> bool:
         for inst in self.instructions_asm:
             inst_parts = inst.split(' ')
@@ -80,6 +78,7 @@ class pyASM():
             self.current_line = 1 # Reset line counter
         return True
     
+    # Validate the arguments of the instructions
     def validate_arguments(self) -> bool:
         for inst in self.instructions_asm:
             inst = inst.split(' ')
@@ -100,7 +99,7 @@ class pyASM():
             self.current_line += 1
         return True
                 
-    
+    # Resolve the instruction to machine code
     def resolve_instruction(self, inst: str) -> str:
         if inst[0] in self.instruction_set:
             if self.instruction_set[inst[0]][0] == str(iset.OP_CODE_R): # R type instruction
@@ -122,7 +121,7 @@ class pyASM():
                 label_mach_code = self.resolve_instruction(inst_label)
                 return label_mach_code
                 
-
+    # Resolve the R type instructions
     def resolve_R_type(self, inst: str) -> str:
         args = inst[1].split(',')
         if len(args) == 3:
@@ -175,7 +174,8 @@ class pyASM():
                 func = self.instruction_set[inst[0]][5]
                 machine_code = self.instruction_set[inst[0]][0] + rs + rt + rd + shamt + func
                 return machine_code
-            
+
+    # Resolve the J type instructions        
     def resolve_J_type(self, inst: str) -> str:
         if inst[0] == 'J':
             # J DIR
@@ -193,7 +193,8 @@ class pyASM():
                 dir = self.translate_to_bin(inst[1], 26)
             machine_code = self.instruction_set[inst[0]][0] + dir
             return machine_code
-                
+
+    # Resolve the I type instructions            
     def resolve_I_type(self, inst: str) -> str:
         args = inst[1].split(',')
         #print("I-type: " + str(args))
@@ -227,9 +228,7 @@ class pyASM():
             inm = self.translate_to_bin(args[2], 16)
             return opcode + rs + rt + inm
 
-
-  
-            
+    # Calculate the offset of the branch instructions        
     def calculate_offset(self, dest: str, src: str) -> str:
         offset = int(dest, 16) - (int(src, 16) + 1) # + 1 porque se calcula el offset con respecto a la siguiente instrucción
         if offset < -32768 or offset > 32767:
@@ -244,16 +243,14 @@ class pyASM():
         binnum_filled = binnum.zfill(size)
         return binnum_filled
 
+    # Binary to hexadecimal
     def bin_to_hex(self, binum: str) -> str:
-        # Convertir el número binario a entero
         intnum = int(binum, 2)
-        # Convertir el entero a hexadecimal y eliminar el prefijo '0x'
         hexnum = hex(intnum)[2:]
-        # Rellenar con ceros a la izquierda para asegurar 8 caracteres (32 bits)
         hexnum_32 = hexnum.zfill(8)
         return '0x' + hexnum_32
         
-    
+    # Decimal to binary
     def dec_to_bin(self, num: str, size: int) -> int:
         num = int(num)
         if num < 0:
@@ -262,17 +259,20 @@ class pyASM():
             bin = format(num, '0{}b'.format(size))
         return bin
     
+    # 0b0 bin format to binary
     def Ob_to_bin(self, num: str, size: int) -> str:
         num_int = int(num, 2)
         bin_str = format(num_int, '0{}b'.format(size))
         return bin_str
 
+    # Get register to binary address
     def to_register(self, reg: str) -> str:
         if reg in self.register_table:
             return self.dec_to_bin(self.register_table[reg], 5)
         else:
             raise Invalid_reg_exception("Invalid register on line " + str(self.current_line) + ": " + reg)
     
+    # Resize binary number
     def bin_rezise(self, binum: str, size: int) -> str:
         if len(binum) < size:
             binum_filled = binum.zfill(size)
@@ -287,12 +287,16 @@ class pyASM():
         if match:
             inm = match.group(1)
             rx = match.group(2)
-            inm = self.translate_to_bin(inm, 16)
+            if inm in self.variables_table:
+                inm = self.translate_to_bin(str(self.variables_table[inm][1]), 16)
+            else:
+                inm = self.translate_to_bin(inm, 16)
             rx = self.to_register(rx)
             return inm, rx
         else:
             raise ValueError("El formato de entrada no es válido")
 
+    # Extraer las variables de una línea de texto
     def get_variables(self, line: str) -> str:
         parts = line.split('=')
         if len(parts) != 2:
@@ -312,7 +316,6 @@ class pyASM():
         if int_type not in valid_types:
             raise ValueError("Invalid input, data types supported: " + ", ".join(valid_types))
         
-        # Validar valor
         if value_str.startswith("0x"): # Hexadecimal
             try:
                 value = int(value_str, 16)
@@ -346,6 +349,7 @@ class pyASM():
         # Imprimir o almacenar las variables extraídas
         self.variables_table[name] = (int_type, value)
     
+    # Translate any number to binary
     def translate_to_bin(self, value: str, size: int) -> str:
         if value.startswith("0x"):
             return self.hex_to_bin(value, size)
