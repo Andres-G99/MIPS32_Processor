@@ -370,6 +370,12 @@ class pyASM():
             instruction = self.instructions_asm[i]
             print(f"{address:<8} {hex_code:<15} {instruction:<20}")
 
+    def get_compiled_code(self):
+        code = []
+        for line in self.instructions_machine_code:
+            code.append(self.bin_to_hex(line))
+        return code
+
 class Invalid_instruction_exception(Exception):
     def __init__(self, msj):
         super().__init__(msj)

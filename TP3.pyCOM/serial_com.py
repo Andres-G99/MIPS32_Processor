@@ -5,7 +5,7 @@ class Uart():
     port = None
     baudrate = 19200
     data_size = 1 # one byte default
-    byteorder = 'little' # little endian default
+    endiantype = 'little' # little endian default
 
     def __init__(self, port):
         self.port = port
@@ -44,14 +44,14 @@ class Uart():
         
 
     # Read data from serial port:
-    def read(self):
-        res = int.from_bytes(self.ser.read(self.data_size), self.byteorder)
+    def read(self, endiantype = 'little'):
+        res = int.from_bytes(self.ser.read(self.data_size), endiantype)
         return res
 
     # Write data to serial port:
-    def write(self, data):
+    def write(self, data, endiantype = 'little'):
         self.ser.write(
-            int(data).to_bytes(self.data_size, self.byteorder)
+            int(data).to_bytes(self.data_size, endiantype)
         )
     
     # Check if data is available to read (size of data_size):
