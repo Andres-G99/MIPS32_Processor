@@ -28,6 +28,7 @@ class pyASM():
         #print(lines)
         # Split input string into lines
         for line in lines:
+            #self.current_line += 1
             if line.startswith("DEFINE"):
                 self.get_variables(line)
             if not line.startswith("#") and not line.startswith("DEFINE"): # Check if line is a comment
@@ -36,6 +37,7 @@ class pyASM():
             print("OPCODES and LABELS Syntax OK!")
             #print(self.labels_address_table)
             if self.validate_arguments():
+                self.current_line = 1 # Reset line counter
                 print("ARGUMENTS Syntax OK!")
                 return True
             else:
@@ -54,10 +56,12 @@ class pyASM():
             machine_code = self.resolve_instruction(inst)
             #print(machine_code)
             self.instructions_machine_code.append(machine_code)
-            print(str(hex(self.current_address*4)) + ": " + self.bin_to_hex(machine_code) + "  " + str(inst))
+            #print(str(hex(self.current_address*4)) + ": " + self.bin_to_hex(machine_code) + "  " + str(inst))
+            #print(self.bin_to_hex(machine_code))
             self.current_address += 1
             self.current_line += 1
-
+        self.print_out()
+        
     # Validate the operation of the instructions
     def validate_operation(self) -> bool:
         for inst in self.instructions_asm:
@@ -73,9 +77,8 @@ class pyASM():
                     self.labels_address_table[inst_parts[0]] = self.current_address
                     self.current_line += 1
                 else:
-                    raise Invalid_instruction_exception("Invalid instruction on line " + str(self.line_index) + ": " + inst_parts[0])
+                    raise Invalid_instruction_exception("Invalid instruction on line " + str(self.current_line) + ": " + inst_parts[0])
             self.current_address += 1 # Increment address 
-            self.current_line = 1 # Reset line counter
         return True
     
     # Validate the arguments of the instructions
@@ -358,6 +361,15 @@ class pyASM():
         else:
             return self.dec_to_bin(value, size)
 
+    def print_out(self):
+        print(f"{'Address':<8} {'Machine Code':<15} {'Instruction':<20}")
+        print("-" * 43)
+        for i in range(len(self.instructions_machine_code)):
+            address = f"{hex(i*4)}:"
+            hex_code = self.bin_to_hex(self.instructions_machine_code[i])
+            instruction = self.instructions_asm[i]
+            print(f"{address:<8} {hex_code:<15} {instruction:<20}")
+
 class Invalid_instruction_exception(Exception):
     def __init__(self, msj):
         super().__init__(msj)
@@ -369,8 +381,6 @@ class Invalid_reg_exception(Exception):
 class Label_not_found_exception(Exception):
     def __init__(self, msj):
         super().__init__(msj)
-
-
 
 if __name__ == '__main__':
     print("pyASM")

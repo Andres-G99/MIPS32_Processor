@@ -1,18 +1,12 @@
 from pyASM import pyASM
 
 def main():
-    file = input_file("test2.asm")
-    #print(file)
-
-    #asm = pyASM()
-    #if asm.validate_asm_code(file) == True:
-    #    print("Syntaxis OK!")
-    #    asm.assamble(file)
+    file = input_file("test2.asm")    
 
     try:
         asm = pyASM()
         if asm.validate_asm_code(file) == True:
-            print("Syntaxis OK!")
+            print("Syntaxis OK!\n")
             asm.assamble(file)
 
     except Exception as e:
