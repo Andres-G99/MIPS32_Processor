@@ -26,6 +26,6 @@ Modos de operación:
  - Paso a paso: Enviando un comando por la UART se ejecuta un ciclo de clock. Se debe mostrar a cada paso los valores.
 
 Para ello se implementó un módulo Debug con una interfaz y buffers. La idea original fue la siguiente:  
-![simple][img/debug_original.png]  
+![simple](img/debug_original.png)  
 A partir de esta base, los distintos flujos de la máquina de estados, quedaron de la siguiente manera:  
-![simple][img/debug_completo.png] 
+![simple](img/debug_completo.png) 
