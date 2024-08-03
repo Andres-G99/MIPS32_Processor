@@ -19,3 +19,13 @@ Y permite las siguientes instrucciones:
 ### EX
 ### MEM
 ### WB
+
+## Debug
+Modos de operación:
+ - Continuo: Se envía un comando a la FPGA por la UART y esta inicia la ejecución del programa hasta llegar al final del mismo (Instrucción HALT). Llegado ese punto se muestran todos los valores en pantalla.
+ - Paso a paso: Enviando un comando por la UART se ejecuta un ciclo de clock. Se debe mostrar a cada paso los valores.
+
+Para ello se implementó un módulo Debug con una interfaz y buffers. La idea original fue la siguiente:  
+![simple][img/debug_original.png]  
+A partir de esta base, los distintos flujos de la máquina de estados, quedaron de la siguiente manera:  
+![simple][img/debug_completo.png] 

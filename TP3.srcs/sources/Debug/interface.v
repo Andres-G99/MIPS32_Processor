@@ -226,7 +226,7 @@ module interface
                 endcase
             end
 
-            /* ########################## Flush y Reset ########################## */
+            /* ########################## Flush ########################## */
 
             // FLUSH: reseteo etapas
             STATE_FLUSH:
@@ -347,7 +347,7 @@ module interface
                                 state_next = STATE_ACTIVATE_WRITER_BUFFER;
                             end
                         else
-                            mips_enabled_next = 1'b1;
+                            mips_enabled_next = 1'b1; // NO HACE FALTA YA
                     end
                 else // programa termina
                     begin
