@@ -79,7 +79,7 @@ class Interface():
 
     # Read response from the board
     def _read_response(self, locked = False):
-        if (sefl.uart.check_data_available(Utils.RES_SIZE_BYTES.value) or locked): # Verify if data is available
+        if (self.uart.check_data_available(Utils.RES_SIZE_BYTES.value) or locked): # Verify if data is available
             res = self.uart.read(Utils.RES_SIZE_BYTES.value)
             
             res_type = (res & Mask.TYPE.value) >> Shift.TYPE.value
