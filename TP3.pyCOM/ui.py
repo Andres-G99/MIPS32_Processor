@@ -1,6 +1,7 @@
 import shutil
 import os
 from pyASM import pyASM
+import serial_com
 from serial_com import Uart
 from interface import Interface, ExecMode
 
@@ -8,12 +9,16 @@ class UI():
     def __init__(self):
         uart = None
         interface = None
+        self.set_up()
+
+    def set_up(self):
+        os.system("cls")
+        self.uart = self.uart_init()
+        self.interface = self.Interface_init(self.uart)
+        self.main_menu()
 
     def main_menu(self):
         os.system("cls")
-        #self.uart = self.uart_init()
-        #self.interface = self.Interface_init(self.uart)
-        #os.system("cls")
         terminal_size = shutil.get_terminal_size((80, 20))  # Valores por defecto si no se puede obtener el tamaño
         width = terminal_size.columns
         title = "MIPS32 UI"
@@ -41,6 +46,7 @@ class UI():
             self.step_program()
 
         elif input_option == "4":
+            os.system("cls")
             exit(0)
 
     # Compile and load program
@@ -62,25 +68,29 @@ class UI():
         self.interface.load_program(code)
         print("\nProgram loaded successfully.")
         input("\nPress Enter to continue...")
+        self.main_menu()
 
     # Normal execution
     def run_program(self):
         os.system("cls")
         print("Running program...\n")
-        self.interface.run_program(Interface.ExecMode.RUN)
-        reg = self.interface.get_registers()
-        mem = self.interface.get_memory()
-        self.print_table(reg, mem)
+        self.interface.run_program(ExecMode.RUN)
+        reg = self.interface.registers
+        mem = self.interface.memory
+        self.print_table(reg, mem, False)
 
     # Step by step execution
     def step_program(self):
-        try:
+        #try:
+        program_state = self.interface.run_program(ExecMode.STEP)
+        while not program_state:
             os.system("cls")
             print("Stepping program...\n")
-            self.interface.run_program(Interface.ExecMode.STEP)
+            #self.interface.run_program(ExecMode.STEP)
             reg = self.interface.get_reg_last_cicle()
             mem = self.interface.get_mem_last_cicle()
-            self.print_table(reg, mem)
+            print("Printing table...\n")
+            self.print_table(reg, mem, True)
 
             while usr_input := input("N to next step: "):
                 if usr_input.lower() == 'n':
@@ -88,18 +98,18 @@ class UI():
                     break
                 else:
                     print("Invalid input.")
-            
-            os.system("cls")
-            if program_state: # Program finished
-                reg = self.interface.get_reg_last_cicle()
-                mem = self.interface.get_mem_last_cicle()
-                self.print_table(reg, mem)
-                print("Program finished.")
-            else:
-                print("Error running program.")
-        except ValueError as e:
-            print(e)
-            input("\nPress Enter to continue...")
+        
+        os.system("cls")
+        if program_state: # Program finished
+            reg = self.interface.get_reg_last_cicle()
+            mem = self.interface.get_mem_last_cicle()
+            self.print_table(reg, mem, True)
+            print("Program finished.")
+        else:
+            print("Error running program.")
+        #except ValueError as e:
+        #    print(e)
+        #    input("\nPress Enter to continue...")
 
     # Read file content
     def input_file(self, file_path: str) -> str:
@@ -114,9 +124,8 @@ class UI():
 
 
     def uart_init(self) -> Uart:
-        uart = Uart(None)
-        uart.set_serial_port()
-        input("Press Enter to continue...")
+        port = serial_com.get_serial_port()
+        uart = Uart(port)
         return uart
 
     def Interface_init(self, uart: Uart) -> Interface:
@@ -128,11 +137,52 @@ class UI():
         for code in codes:
             hex_byte = code[2:].zfill(8)
             byte_list.extend([hex_byte[i:i+2] for i in range(0, len(hex_byte), 2)])
-        print(byte_list)
+        #print(byte_list)
+        return byte_list
 
-    def print_table(self, reg: list, mem: list):
-        pass # TODO
+    def print_table(self, register: list, memory: list, by_cicle: bool):
+        terminal_width = os.get_terminal_size().columns
+        half_twidth = terminal_width // 2
+        line_len = '-' * terminal_width
 
-ui = UI()
-ui.__init__()
-ui.main_menu()
+        mem_side = f"{'Memory':^{half_twidth}}"
+        reg_side = f"{'Registers':^{half_twidth}}"
+
+        print(f"{line_len}\n{reg_side}{'|':^1}{mem_side}\n{line_len}")
+
+        reg_print = []
+        mem_print = []
+
+        for reg in register:
+            addr = '0x' + format(reg['addr'], '08x')
+            data = '0x' + format(reg['data'], '08x')
+            if by_cicle:
+                reg_print.append(f"Cicle: {reg['cicle']} Addr: {addr} Data: {data}")
+            else:
+                reg_print.append(f"Addr: {addr} Data: {data}")
+
+        for mem in memory:
+            addr = '0x' + format(mem['addr'], '08x')
+            data = '0x' + format(mem['data'], '08x')
+            if by_cicle:
+                mem_print.append(f"Cicle: {mem['cicle']} Addr: {addr} Data: {data}")
+            else:
+                mem_print.append(f"Addr: {addr} Data: {data}")
+        
+        if len(reg_print) > len(mem_print):
+            mem_print.append(' ' * half_twidth)
+
+        elif len(mem_print) > len(reg_print):
+            reg_print.append(' ' * half_twidth)
+            
+        for i in range(max(len(reg_print), len(mem_print))):
+            if i < len(reg_print):
+                reg = reg_print[i] + " " * (half_twidth - len(reg_print[i])-1)
+            else:
+                reg = " " * len(half_twidth - 1)
+
+            if i < len(mem_print):
+                mem = mem_print[i] + " " * (half_twidth - len(mem_print[i])-1)
+            else:
+                mem = " " * len(half_twidth - 1)
+            print(reg + " " + "|" + " " + mem)

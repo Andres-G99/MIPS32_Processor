@@ -1,4 +1,4 @@
-from uart import Uart
+from serial_com import Uart
 from enum import Enum, auto
 import time
 
@@ -19,7 +19,7 @@ class Response(Enum):
     EMPTY_PROGRAM = 0x2
 
 class Result(Enum):
-    ERROR = 0xFF
+    ERROR = 0xff
     INFO = 0x00
     REG = 0x01
     MEM = 0x02
@@ -48,7 +48,6 @@ class Interface():
 
     def __init__(self, uart: Uart):
         self.uart = uart
-        self.uart.set_serial_port()
 
     # Load program to the board
     def load_program(self, inst: list):
@@ -57,10 +56,13 @@ class Interface():
         if type != None:
             raise LoadProgramException(f"Error loading program: {hex(data)}")
         
+        print("Loading program...")
+        print(inst)
+
         for i in range(0, len(inst), 4):
             for j in range(3, -1, -1):
                 if i+j < len(inst):
-                    self.uart.write(int(inst[i+j], 16), endiantype = 'big')
+                    self.uart.write(int(inst[i+j], 16), byteorder = 'big')
                 else:
                     break
         
@@ -115,6 +117,7 @@ class Interface():
                 self.memory.append({'cicle': res_cicle, 'addr': res_addr, 'data': res_data})
             else:
                 time.sleep(0.1)
+                print(res_type)
 
     def run_program(self, mode: ExecMode):
         self.registers = []
@@ -127,6 +130,7 @@ class Interface():
         elif mode == ExecMode.STEP:
             self._send_cmd(Command.EXEC_BY_STEPS.value)
             self.step_mode_flg = True
+            input("Modo step")
         else:
             raise ValueError("Invalid mode.")
         return self._read_result()
@@ -134,7 +138,8 @@ class Interface():
     def run_next_step(self) -> bool:
         if not self.step_mode_flg:
             raise ValueError("Not in step mode.")
-
+        
+        print("Running next step...")
         self._send_cmd(Command.NEXT_STEP.value)
         return self._read_result()
 
