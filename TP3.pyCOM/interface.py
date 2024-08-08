@@ -25,20 +25,22 @@ class Result(Enum):
     MEM = 0x02
 
 class Mask(Enum):
-    TYPE = 0xFF000000000000
-    CICLE = 0x00FF0000000000
-    ADDR = 0x0000FF00000000
-    DATA = 0x000000FFFFFFFF
+    TYPE = 0xFF00000000000000000000
+    CICLE = 0x00FF000000000000000000
+    ADDR = 0x0000FF0000000000000000
+    DATA = 0x000000FFFFFFFF00000000
+    PC = 0x0000000000000000FFFFFFFF
 
 class Shift(Enum):
-    TYPE = 48
-    CICLE = 40
-    ADDR = 32
-    DATA = 0
+    TYPE = 80
+    CICLE = 72
+    ADDR = 64
+    DATA = 32
+    PC = 0
 
 class Utils(Enum):
     FILL_BYTES_ZERO = 0x00
-    RES_SIZE_BYTES = 7
+    RES_SIZE_BYTES = 11
 
 class Interface():
     uart = None
@@ -86,15 +88,16 @@ class Interface():
             res_cicle = (res & Mask.CICLE.value) >> Shift.CICLE.value
             res_addr = (res & Mask.ADDR.value) >> Shift.ADDR.value
             res_data = (res & Mask.DATA.value) >> Shift.DATA.value
+            res_pc = (res & Mask.PC.value) >> Shift.PC.value
 
-            return res_type, res_cicle, res_addr, res_data
+            return res_type, res_cicle, res_addr, res_data, res_pc
         else:
-            return None, None, None, None
+            return None, None, None, None, None
 
     # Read registers and memory from the board
     def _read_result(self) -> bool:
         while(True):
-            res_type, res_cicle, res_addr, res_data = self._read_response()
+            res_type, res_cicle, res_addr, res_data, res_pc = self._read_response()
             if res_type == Result.ERROR.value:
                 if res_data == Response.EMPTY_PROGRAM.value:
                     print("Empty program.")
@@ -110,9 +113,9 @@ class Interface():
                     return False
 
             elif res_type == Result.REG.value:
-                self.registers.append({'cicle': res_cicle, 'addr': res_addr, 'data': res_data})
+                self.registers.append({'cicle': res_cicle, 'addr': res_addr, 'data': res_data, 'pc': res_pc})
             elif res_type == Result.MEM.value:
-                self.memory.append({'cicle': res_cicle, 'addr': res_addr, 'data': res_data})
+                self.memory.append({'cicle': res_cicle, 'addr': res_addr, 'data': res_data, 'pc': res_pc})
             else:
                 time.sleep(0.1)
 

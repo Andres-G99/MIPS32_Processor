@@ -4,7 +4,7 @@ module debugger
     #(
         parameter UART_BUS_SIZE = 8,
         parameter DATA_IN_BUS_SIZE = UART_BUS_SIZE * 4,
-        parameter DATA_OUT_BUS_SIZE = UART_BUS_SIZE * 7,
+        parameter DATA_OUT_BUS_SIZE = UART_BUS_SIZE * 11,
         parameter REGISTER_SIZE = 32,
         parameter REGISTER_BANK_BUS_SIZE = REGISTER_SIZE * 32,
         parameter MEMORY_SLOT_SIZE = 32,

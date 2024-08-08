@@ -4,7 +4,7 @@ module interface
     #(
         parameter UART_DATA_LEN = 8,
         parameter DATA_IN_LEN = UART_DATA_LEN * 4,
-        parameter DATA_OUT_LEN = UART_DATA_LEN * 7,
+        parameter DATA_OUT_LEN = UART_DATA_LEN * 11,
         parameter REG_LEN = 32
     )
     (
@@ -42,6 +42,7 @@ module interface
     localparam CODE_ERROR_INSTRUCTION_MEMORY_FULL = 32'b00000000000000000000000000000001;
     localparam CODE_ERROR_NO_PROGRAM_LOAD = 32'b00000000000000000000000000000010;
     localparam INSTRUCTION_HALT = 32'b11111111111111111111111111111111;
+    localparam CODE_NO_PC = 32'b00000000000000000000000000000000;
     
     // Estados de la máquina de estados
     localparam STATE_READ = 5'b00000;
@@ -179,7 +180,7 @@ module interface
 
             STATE_EMPTY_PROGRAM:
             begin
-                ctrl_info_next = {CODE_ERROR_PREFIX, CODE_NO_CICLE_MASK, CODE_NO_ADDRESS_MASK, CODE_ERROR_NO_PROGRAM_LOAD};
+                ctrl_info_next = {CODE_ERROR_PREFIX, CODE_NO_CICLE_MASK, CODE_NO_ADDRESS_MASK, CODE_ERROR_NO_PROGRAM_LOAD, CODE_NO_PC};
                 uart_write_next = 1'b1;
                 return_state_next = return_state;
                 state_next = STATE_ACTIVATE_WRITER_BUFFER;
@@ -253,7 +254,7 @@ module interface
                             end
                         else // lleno
                             begin
-                                ctrl_info_next = {CODE_ERROR_PREFIX, CODE_NO_CICLE_MASK, CODE_NO_ADDRESS_MASK, CODE_ERROR_INSTRUCTION_MEMORY_FULL};
+                                ctrl_info_next = {CODE_ERROR_PREFIX, CODE_NO_CICLE_MASK, CODE_NO_ADDRESS_MASK, CODE_ERROR_INSTRUCTION_MEMORY_FULL, CODE_NO_PC};
                                 uart_write_next = 1'b1;
                                 state_next = STATE_ACTIVATE_WRITER_BUFFER;
                                 return_state_next  = STATE_IDLE;
@@ -261,7 +262,7 @@ module interface
                     end
                 else // para instruccion HALT (finaliza carga del programa)
                     begin
-                        ctrl_info_next = {CODE_INFO_PREFIX, CODE_NO_CICLE_MASK, CODE_NO_ADDRESS_MASK, CODE_INFO_LOAD_PROGRAM};
+                        ctrl_info_next = {CODE_INFO_PREFIX, CODE_NO_CICLE_MASK, CODE_NO_ADDRESS_MASK, CODE_INFO_LOAD_PROGRAM, CODE_NO_PC};
                         uart_write_next = 1'b1;
                         state_next = STATE_ACTIVATE_WRITER_BUFFER;
                         return_state_next = STATE_IDLE;
@@ -341,7 +342,7 @@ module interface
                     begin
                         if (step_mode) // terminar un paso
                             begin
-                                ctrl_info_next = {CODE_INFO_PREFIX, CODE_NO_CICLE_MASK, CODE_NO_ADDRESS_MASK, CODE_INFO_END_STEP};
+                                ctrl_info_next = {CODE_INFO_PREFIX, CODE_NO_CICLE_MASK, CODE_NO_ADDRESS_MASK, CODE_INFO_END_STEP, CODE_NO_PC};
                                 uart_write_next = 1'b1;
                                 return_state_next = STATE_WAIT_NEXT_STEP;
                                 state_next = STATE_ACTIVATE_WRITER_BUFFER;
@@ -351,7 +352,7 @@ module interface
                     end
                 else // programa termina
                     begin
-                        ctrl_info_next = {CODE_INFO_PREFIX, CODE_NO_CICLE_MASK, CODE_NO_ADDRESS_MASK, CODE_INFO_END_PROGRAM};
+                        ctrl_info_next = {CODE_INFO_PREFIX, CODE_NO_CICLE_MASK, CODE_NO_ADDRESS_MASK, CODE_INFO_END_PROGRAM, CODE_NO_PC};
                         uart_write_next = 1'b1;
                         return_state_next = STATE_IDLE;
                         state_next = STATE_ACTIVATE_WRITER_BUFFER;

@@ -3,7 +3,7 @@
 module memory_printer
     #(
         parameter UART_BUS_SIZE = 8,
-        parameter DATA_OUT_BUS_SIZE = UART_BUS_SIZE * 7,
+        parameter DATA_OUT_BUS_SIZE = UART_BUS_SIZE * 11,
         parameter MEMORY_SLOT_SIZE = 32,
         parameter MEMORY_DATA_BUS_SIZE = MEMORY_SLOT_SIZE * 32
     )
@@ -75,7 +75,7 @@ module memory_printer
             begin
                 if (memory_pointer < MEMORY_DATA_BUS_SIZE / MEMORY_SLOT_SIZE)
                     begin
-                        data_wr_next = {8'b00000010, i_clk_cicle , { { (UART_BUS_SIZE - MEMORY_POINTER_SIZE - 1) { 1'b0 } }, memory_pointer }, i_memory_conntent[memory_pointer * MEMORY_SLOT_SIZE +: MEMORY_SLOT_SIZE] };
+                        data_wr_next = {8'b00000010, i_clk_cicle , { { (UART_BUS_SIZE - MEMORY_POINTER_SIZE - 1) { 1'b0 } }, memory_pointer }, i_memory_conntent[memory_pointer * MEMORY_SLOT_SIZE +: MEMORY_SLOT_SIZE], 32'b11111111111111111111111111111111 };
                         memory_pointer_next = memory_pointer + 1;
                         start_wr_next = 1'b1;
                         state_next = MEMORY_PRINTER_STATE_WAIT_WR_TRANSITION;

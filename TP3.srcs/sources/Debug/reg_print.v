@@ -3,7 +3,7 @@
 module register_printer
     #(
         parameter UART_BUS_SIZE = 8,
-        parameter DATA_OUT_BUS_SIZE = UART_BUS_SIZE * 7 ,
+        parameter DATA_OUT_BUS_SIZE = UART_BUS_SIZE * 11 ,
         parameter REGISTER_SIZE = 32,
         parameter REGISTER_BANK_BUS_SIZE = REGISTER_SIZE * 32
     )
@@ -78,7 +78,7 @@ module register_printer
             begin
                 if (reg_pointer < REGISTER_BANK_BUS_SIZE / REGISTER_SIZE) // leer de a un registro
                     begin // 1 PARA REG Y 01 PARA MEM
-                        data_write_next = {8'b00000001, i_clk_cicle, { { (UART_BUS_SIZE - REG_POINTER_SIZE - 1) { 1'b0 } }, reg_pointer } , i_reg_bank[reg_pointer * REGISTER_SIZE +: REGISTER_SIZE] };
+                        data_write_next = {8'b00000001, i_clk_cicle, { { (UART_BUS_SIZE - REG_POINTER_SIZE - 1) { 1'b0 } }, reg_pointer } , i_reg_bank[reg_pointer * REGISTER_SIZE +: REGISTER_SIZE], 32'b11111111111111111111111111111111 };
                         reg_pointer_next = reg_pointer + 1;
                         write_next = 1'b1;
                         state_next = STATE_WAIT_WR_TRANSITION;

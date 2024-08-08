@@ -2,14 +2,14 @@
 
 module adder
     #(
-        parameter DATA_WIDTH = 32
+        parameter BUS_SIZE = 32
     )
     (
-        input wire [DATA_WIDTH-1:0] i_a,
-        input wire [DATA_WIDTH-1:0] i_b,
-        input wire [DATA_WIDTH-1:0] o_res
+        input  wire [BUS_SIZE - 1 : 0] a,
+        input  wire [BUS_SIZE - 1 : 0] b,
+        output wire [BUS_SIZE - 1 : 0] sum
     );
     
-    assign o_res = i_a + i_b;
-    
+    assign sum = a + b;
+
 endmodule

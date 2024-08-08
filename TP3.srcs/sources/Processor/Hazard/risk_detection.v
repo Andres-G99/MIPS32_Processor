@@ -1,7 +1,7 @@
 `timescale 1ns / 1ps
 
 module risk_detection
-    (
+    #(
         parameter CODE_FUNCT_JALR = 6'b001001,
         parameter CODE_FUNCT_JR = 6'b001000,
 
@@ -17,8 +17,8 @@ module risk_detection
         parameter CODE_OP_LH = 6'b100001,
         parameter CODE_OP_LHU = 6'b100101,
         parameter CODE_OP_LUI = 6'b001111,
-        parameter CODE_OP_LWU = 6'b100111,
-
+        parameter CODE_OP_LWU = 6'b100111
+    )(
         input wire i_jump_stop, // Indica si se debe detener el salto (REVISAR)
         input wire [4:0] i_if_id_rs, // Registro rs en la etapa IF/ID
         input wire [4:0] i_if_id_rd, // Registro rd en la etapa IF/ID
@@ -38,7 +38,7 @@ module risk_detection
     assign o_jmp_stop = ( 
             (i_if_id_funct == CODE_FUNCT_JALR || i_if_id_funct == CODE_FUNCT_JR && i_if_id_op == CODE_OP_R_TYPE) || 
             (i_if_id_op == CODE_OP_BNE || i_if_id_op == CODE_OP_BEQ) 
-            ) && !i_jmp_stop;
+            ) && !i_jump_stop;
     // JARL y JR -> R_TYPE
     // BNE y BEQ -> I_TYPE (Pero no es necesario evaluar porque no estan agrupadas por tipo cono JARL y JR)
     // Evalúa si la instrucción es JARL, JR, BNE o BEQ y si se debe detener el pipeline.
