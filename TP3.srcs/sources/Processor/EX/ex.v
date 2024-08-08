@@ -51,7 +51,7 @@ module ex
         .o_result (o_alu_result)
     );
 
-    alu_control 
+    alu_ctrl 
     #(
         .ALU_CTRL_BUS_WIDTH (ALU_CTRL_BUS_WIDTH),
         .ALU_OP_BUS_WIDTH (3),

@@ -421,7 +421,7 @@ module mips
         .i_if_id_funct (o_id_funct),
         .i_id_ex_rt    (i_ex_rt),
         .i_id_ex_op    (o_id_ex_op),
-        .i_jmp_stop    (o_id_ex_jmp_stop),
+        .i_jump_stop    (o_id_ex_jmp_stop),
         .o_jmp_stop    (i_id_ex_jmp_stop),
         .o_not_load    (i_if_not_load),
         .o_halt        (i_if_halt),
