@@ -4,7 +4,7 @@ import time
 
 class Command(Enum):
     LOAD = 0x4c
-    EXEC = 0x45
+    EXEC = 0x43
     EXEC_BY_STEPS = 0x53
     NEXT_STEP = 0x4e
 

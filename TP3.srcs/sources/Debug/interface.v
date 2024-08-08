@@ -201,7 +201,7 @@ module interface
                     end
 
                     // CONTINUOUS: modo continuo de ejecución
-                    "E":
+                    "C":
                     begin
                         step_mode_next = 1'b0;
                         flush_next = 1'b1;
