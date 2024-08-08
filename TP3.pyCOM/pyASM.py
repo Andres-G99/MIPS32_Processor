@@ -141,8 +141,8 @@ class pyASM():
             elif (inst[0] == 'SLLV' or inst[0] == 'SRLV' or inst[0] == 'SRAV'):
                 # XXXX $rd, $rt, $rs
                 rd = self.to_register(args[0])
-                rt = self.to_register(args[1])
-                rs = self.to_register(args[2])
+                rs = self.to_register(args[1])
+                rt = self.to_register(args[2])
                 shamt = self.dec_to_bin(0, 5)
                 func = self.instruction_set[inst[0]][5]
                 machine_code = self.instruction_set[inst[0]][0] + rs + rt + rd + shamt + func

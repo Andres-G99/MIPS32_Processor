@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module ID_EX_sreg
+module id_ex
     #(
         parameter BUS_WIDTH = 32
     )
