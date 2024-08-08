@@ -55,10 +55,8 @@ class Interface():
         type, _, _, data = self._read_response()
         if type != None:
             raise LoadProgramException(f"Error loading program: {hex(data)}")
-        
+    
         print("Loading program...")
-        print(inst)
-
         for i in range(0, len(inst), 4):
             for j in range(3, -1, -1):
                 if i+j < len(inst):
@@ -117,7 +115,6 @@ class Interface():
                 self.memory.append({'cicle': res_cicle, 'addr': res_addr, 'data': res_data})
             else:
                 time.sleep(0.1)
-                print(res_type)
 
     def run_program(self, mode: ExecMode):
         self.registers = []

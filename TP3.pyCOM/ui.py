@@ -21,7 +21,7 @@ class UI():
         os.system("cls")
         terminal_size = shutil.get_terminal_size((80, 20))  # Valores por defecto si no se puede obtener el tamaño
         width = terminal_size.columns
-        title = "MIPS32 UI"
+        title = " MIPS32 UI "
         total_dashes = width - len(title)
         left_dashes = total_dashes // 2
         right_dashes = total_dashes - left_dashes
@@ -78,38 +78,41 @@ class UI():
         reg = self.interface.registers
         mem = self.interface.memory
         self.print_table(reg, mem, False)
+        input("\nPress Enter to continue...")
+        self.main_menu()
 
     # Step by step execution
     def step_program(self):
-        #try:
-        program_state = self.interface.run_program(ExecMode.STEP)
-        while not program_state:
-            os.system("cls")
-            print("Stepping program...\n")
-            #self.interface.run_program(ExecMode.STEP)
-            reg = self.interface.get_reg_last_cicle()
-            mem = self.interface.get_mem_last_cicle()
-            print("Printing table...\n")
-            self.print_table(reg, mem, True)
+        try:
+            program_state = self.interface.run_program(ExecMode.STEP)
+            while not program_state:
+                os.system("cls")
+                print("Stepping program...\n")
+                reg = self.interface.get_reg_last_cicle()
+                mem = self.interface.get_mem_last_cicle()
+                print("Printing table...\n")
+                self.print_table(reg, mem, True)
 
-            while usr_input := input("N to next step: "):
-                if usr_input.lower() == 'n':
-                    program_state = self.interface.run_next_step()
-                    break
-                else:
-                    print("Invalid input.")
-        
-        os.system("cls")
-        if program_state: # Program finished
-            reg = self.interface.get_reg_last_cicle()
-            mem = self.interface.get_mem_last_cicle()
-            self.print_table(reg, mem, True)
-            print("Program finished.")
-        else:
-            print("Error running program.")
-        #except ValueError as e:
-        #    print(e)
-        #    input("\nPress Enter to continue...")
+                while usr_input := input("N to next step: "):
+                    if usr_input.lower() == 'n':
+                        program_state = self.interface.run_next_step()
+                        break
+                    else:
+                        print("Invalid input.")
+            
+            os.system("cls")
+            if program_state: # Program finished
+                reg = self.interface.get_reg_last_cicle()
+                mem = self.interface.get_mem_last_cicle()
+                self.print_table(reg, mem, True)
+                print("Program finished.")
+            else:
+                print("Error running program.")
+        except ValueError as e:
+            print(e)
+            input("\nPress Enter to continue...")
+        input("\nPress Enter to continue...")
+        self.main_menu()
 
     # Read file content
     def input_file(self, file_path: str) -> str:
