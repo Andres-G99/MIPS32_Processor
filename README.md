@@ -29,3 +29,5 @@ Para ello se implementó un módulo Debug con una interfaz y buffers. La idea or
 ![simple](img/debug_original.png)  
 A partir de esta base, los distintos flujos de la máquina de estados, quedaron de la siguiente manera:  
 ![simple](img/debug_completo.png) 
+
+https://phoenix.goucher.edu/~kelliher/f2009/cs220/mipsir.html

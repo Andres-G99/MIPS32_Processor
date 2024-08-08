@@ -156,21 +156,25 @@ class UI():
         reg_print = []
         mem_print = []
 
+        i_reg = 0
         for reg in register:
-            addr = '0x' + format(reg['addr'], '08x')
-            data = '0x' + format(reg['data'], '08x')
+            addr = '0x' + format(reg['addr'], '08x').upper()
+            data = '0x' + format(reg['data'], '08x').upper()
             if by_cicle:
-                reg_print.append(f"Cicle: {reg['cicle']} Addr: {addr} Data: {data}")
+                reg_print.append(f"Cicle: {reg['cicle']} R{i_reg}: {addr} Data: {data}")
             else:
-                reg_print.append(f"Addr: {addr} Data: {data}")
+                reg_print.append(f"R{i_reg}: {addr} Data: {data}")
+            i_reg += 1
 
+        i_mem = 0
         for mem in memory:
-            addr = '0x' + format(mem['addr'], '08x')
-            data = '0x' + format(mem['data'], '08x')
+            addr = '0x' + format(mem['addr'], '08x').upper()
+            data = '0x' + format(mem['data'], '08x').upper()
             if by_cicle:
-                mem_print.append(f"Cicle: {mem['cicle']} Addr: {addr} Data: {data}")
+                mem_print.append(f"Cicle: {mem['cicle']} M{i_mem}: {addr} Data: {data}")
             else:
-                mem_print.append(f"Addr: {addr} Data: {data}")
+                mem_print.append(f"M{i_mem}: {addr} Data: {data}")
+            i_mem += 1
         
         if len(reg_print) > len(mem_print):
             mem_print.append(' ' * half_twidth)
