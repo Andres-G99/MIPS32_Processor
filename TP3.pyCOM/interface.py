@@ -127,7 +127,6 @@ class Interface():
         elif mode == ExecMode.STEP:
             self._send_cmd(Command.EXEC_BY_STEPS.value)
             self.step_mode_flg = True
-            input("Modo step")
         else:
             raise ValueError("Invalid mode.")
         return self._read_result()
