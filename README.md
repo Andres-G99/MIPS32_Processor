@@ -26,9 +26,36 @@ Y permite las siguientes instrucciones:
 ![modo_step](/img/modo_step.png)  
 7. Verificamos que los datos sean correctos con un [análisis instrucción por instrucción](https://docs.google.com/spreadsheets/d/1HQWv1dA8hQ2l9KSv4gJhaPP8k8ei2q0zWhnZzRozxcY/edit?usp=sharing)
 ## Etapas
+
 ### IF
-### ID
-Instrucctiones: https://phoenix.goucher.edu/~kelliher/f2009/cs220/mipsir.html  
+
+__Función__: Obtener la próxima instrucción de la memoria.  
+__Funcionamiento__: 
+- Se obtiene la instrucción basándose en la dirección del PC.
+- El PC se actualiza para apuntar a la siguiente instrucción. Se incrementa en 32 bits si es secuencial. 
+- Se implementan módulos para llevar la cuenta del pc y para guardar las intrucciones. 
+
+__Output__: Instrucción obtenida y el PC actualizado se prepara para el siguiente fetch.
+
+### ID  
+__Función__: Decodificar la instrucción y leer los datos necesarios del banco de registros.  
+__Funcionamiento__:  
+- Se determina la operación
+- Se identifican los registros de origen y destino.  
+- Se generan señales de control desde la ctrl_unit.  
+- Se accede al banco de registros para leer o almacenar los valores de los operandos si la instrucción lo requiere.  
+
+[Conjunto de instrucciones](https://phoenix.goucher.edu/~kelliher/f2009/cs220/mipsir.html)  
+![instrucciones_mips](/img/instrucciones_formato.png)
+- op: identificador de instrucción
+- rs, rt: identificadores de los primer y segundo registros fuente 
+- rd: identificador del registro destino
+- shamt: cantidad a desplazar (en operaciones de desplazamiento)
+- funct: selecciona la operación aritmética a realizar
+- inmediato: operando inmediato o desplazamiento en direccionamiento a registro-base
+- dirección: dirección destino del salto  
+
+__Output__: La instrucción decodificada, las señales de control y los valores de los operandos.
 ### EX
 ### MEM
 ### WB
