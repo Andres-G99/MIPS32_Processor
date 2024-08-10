@@ -1,5 +1,7 @@
 `timescale 1ns / 1ps
 
+/* Memoria de instrucciones: Almacena y obtiene instrucciones del programa */
+
 module Instruction_Memory
    #(
     parameter PC_WIDTH = 32, // 32 bits
