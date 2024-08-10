@@ -70,18 +70,18 @@ module id
     wire [BUS_SIZE - 1 : 0] jump_pc_dir; // dirección de la próxima instrucción en caso de salto no condicional
     
     /* Assignment internal wires */
-    assign shamt = i_instruction[10:6];
-    assign inm = i_instruction[15:0];
-    assign dir = i_instruction[25:0];
     assign jmp_ctrl = ctrl_register[18:17]; // control para saber si la instrucción es de salto
     assign jump_pc_dir = { i_next_seq_pc[31:28], dir_ext_unsigned_shifted[27:0] }; // calcular la dirección de salto
 
-    /* Assignment output wires */
+    /* formato intruccion */
     assign o_opp = i_instruction[31:26];
-    assign o_rs = i_instruction[25:21];
+    assign o_rs = i_instruction[25:21]; // Tipo R
     assign o_rt = i_instruction[20:16];
     assign o_rd = i_instruction[15:11];
+    assign shamt = i_instruction[10:6];
     assign o_funct = i_instruction[5:0];
+    assign inm = i_instruction[15:0]; // Tipo I
+    assign dir = i_instruction[25:0]; // Tipo J
 
     assign o_next_pc_source = ctrl_register[19];
     assign o_reg_dst = next_stage_ctrl_register[16:15];

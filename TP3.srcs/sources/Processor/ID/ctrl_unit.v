@@ -109,20 +109,6 @@ module ctrl_register
         input  wire [5 : 0]  i_funct,
         output wire [19 : 0] o_ctrl_register
     );
-    
-    /* CONTROL register:
-    instruction[19] : next_pc_src
-    instruction[18:b17] : jmp_ctrl
-    instruction[b16:b15] : reg_dst
-    instruction[b14] : alu_src_A
-    instruction[b13:b11] : alu_src_B
-    instruction[b10:b8] : alu_opp
-    instruction[b7:b5] : mem_read_source
-    instruction[b4:b3] : mem_write_source
-    instruction[b2] : mem_write
-    instruction[b1] : wb
-    instruction[b0] : mem_to_reg
-    */
 
     reg [19 : 0] ctrl_register; 
     // reg next_pc_src;
