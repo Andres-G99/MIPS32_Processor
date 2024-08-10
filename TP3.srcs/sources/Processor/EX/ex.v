@@ -1,5 +1,10 @@
 `timescale 1ns / 1ps
 
+/*
+Se implementa la etapa de ejecución de instrucciones (EX),
+que realiza operaciones aritméticas y lógicas.
+*/
+
 module ex
     #(
         parameter BUS_SIZE = 32,
@@ -7,27 +12,27 @@ module ex
     )
     (   // control inputs
         input wire i_alu_src_A, 
-        input wire  [2 : 0] i_alu_src_B,
-        input wire  [1 : 0] i_reg_dst,
-        input wire  [2 : 0] i_alu_opp,
-        input wire  [1 : 0] i_src_A_select, // selects the source for forwarding data to the ALU input A
-        input wire  [1 : 0] i_src_B_select, // selects the source for forwarding data to the ALU input B
-        input wire  [4 : 0] i_rt,
-        input wire  [4 : 0] i_rd,
-        input wire  [5 : 0] i_funct,
+        input wire [2 : 0] i_alu_src_B,
+        input wire [1 : 0] i_reg_dst,
+        input wire [2 : 0] i_alu_opp,
+        input wire [1 : 0] i_src_A_select, // selects the source for forwarding data to the ALU input A
+        input wire [1 : 0] i_src_B_select, // selects the source for forwarding data to the ALU input B
+        input wire [4 : 0] i_rt,
+        input wire [4 : 0] i_rd,
+        input wire [5 : 0] i_funct,
         // data inputs
-        input wire  [BUS_SIZE - 1 : 0] i_forwarded_alu_result, // for data forwarding (result from previous instruction)
-        input wire  [BUS_SIZE - 1 : 0] i_forwarded_wb_result, // for data forwarding (writeback from previous instruction)
-        input wire  [BUS_SIZE - 1 : 0] i_bus_A,
-        input wire  [BUS_SIZE - 1 : 0] i_bus_B,
-        input wire  [BUS_SIZE - 1 : 0] i_shamt_ext_unsigned,
-        input wire  [BUS_SIZE - 1 : 0] i_inm_ext_signed,
-        input wire  [BUS_SIZE - 1 : 0] i_inm_upp,
-        input wire  [BUS_SIZE - 1 : 0] i_inm_ext_unsigned,
-        input wire  [BUS_SIZE - 1 : 0] i_next_seq_pc,
+        input wire [BUS_SIZE - 1 : 0] i_forwarded_alu_result, // for data forwarding (result from previous instruction)
+        input wire [BUS_SIZE - 1 : 0] i_forwarded_wb_result, // for data forwarding (writeback from previous instruction)
+        input wire [BUS_SIZE - 1 : 0] i_bus_A,
+        input wire [BUS_SIZE - 1 : 0] i_bus_B,
+        input wire [BUS_SIZE - 1 : 0] i_shamt_ext_unsigned,
+        input wire [BUS_SIZE - 1 : 0] i_inm_ext_signed,
+        input wire [BUS_SIZE - 1 : 0] i_inm_upp,
+        input wire [BUS_SIZE - 1 : 0] i_inm_ext_unsigned,
+        input wire [BUS_SIZE - 1 : 0] i_next_seq_pc,
         
-        output wire [4 : 0] o_wb_addr,
-        output wire [BUS_SIZE - 1 : 0] o_alu_result,
+        output wire [4 : 0] o_wb_addr, // wb destination register
+        output wire [BUS_SIZE - 1 : 0] o_alu_result, // alu result
         output wire [BUS_SIZE - 1 : 0] o_forwarded_data_A, // carries the forwarded data that will be used as ALU input A
         output wire [BUS_SIZE - 1 : 0] o_forwarded_data_B // carries the forwarded data that will be used as ALU input B
     );
@@ -64,7 +69,7 @@ module ex
         .o_alu_ctrl (alu_ctrl)
     );
 
-    /* MUX for Data A and B */
+    /* MUX for ALU Data A and B */
     mux 
     #(
         .CHANNELS(2), 
@@ -89,7 +94,7 @@ module ex
         .data_out (alu_data_B)
     );
 
-    /* MUX for short circuit sources */
+    /* MUX for data forwarding */
     mux 
     #(
         .CHANNELS(3), 
@@ -114,7 +119,7 @@ module ex
         .data_out (o_forwarded_data_B)
     );
 
-    /* MUX for register destination */
+    /* MUX for WB register destination */
     mux 
     #(
         .CHANNELS(3), 

@@ -1,22 +1,24 @@
 `timescale 1ns / 1ps
 
+/* Memoria de datos */
+
 module data_memory
     #(
         parameter ADDR_SIZE = 5,
         parameter SLOT_SIZE = 32
     )
     (      
-        input  wire                                    i_clk,
-        input  wire                                    i_reset,
-        input  wire                                    i_flush,
-        input  wire                                    i_wr_rd,
-        input  wire [ADDR_SIZE - 1 : 0]                i_addr,
-        input  wire [SLOT_SIZE - 1 : 0]                i_data,
-        output wire [SLOT_SIZE - 1 : 0]                o_data,
+        input wire i_clk,
+        input wire i_reset,
+        input wire i_flush,
+        input wire i_wr_rd,
+        input wire [ADDR_SIZE - 1 : 0] i_addr,
+        input wire [SLOT_SIZE - 1 : 0] i_data,
+        output wire [SLOT_SIZE - 1 : 0] o_data,
         output wire [2**ADDR_SIZE * SLOT_SIZE - 1 : 0] o_bus_debug
     );
 
-    reg [SLOT_SIZE - 1 : 0] memory [2**ADDR_SIZE - 1 : 0];
+    reg [SLOT_SIZE - 1 : 0] memory [2**ADDR_SIZE - 1 : 0]; // mem matrix
 
     integer i = 0;
 
@@ -29,13 +31,14 @@ module data_memory
             end
         else
             begin
-                if (i_wr_rd)
+                if (i_wr_rd) // write opp
                     memory[i_addr] <= i_data;
             end
     end
 
-    assign o_data = memory[i_addr];
+    assign o_data = memory[i_addr]; // for reading
 
+    /* Outputs entire memory for printing */
     generate
         genvar j;
         
