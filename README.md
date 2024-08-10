@@ -56,8 +56,23 @@ __Funcionamiento__:
 - dirección: dirección destino del salto  
 
 __Output__: La instrucción decodificada, las señales de control y los valores de los operandos.
+
 ### EX
+__Función__: Realizar operaciones aritméticas y lógicas.  
+__Funcionamiento__:  
+- La ALU realiza la operación especificada por la instrucción (por ejemplo, suma, resta, and, etc).  
+- Se impementan multiplexores para seleccionar los operandos de la ALU, la dirección de destino para la etapa WB y los datos de forwarding.
+
+__Output__: El resultado de la operación de la ALU, el dato fowarded y el destino de WB.
+
 ### MEM
+__Función__: Acceder a la memoria de datos si la instrucción lo requiere (operaciones de lectura/escritura).  
+__Funcionamiento__:
+- Se utiliza un módulo data_memory para acceder a los datos en memoria.
+- Se manipulan los datos a leer o escribir (extension con signo, sin signo, halfword, byte, etc).  
+
+__Output__: Los datos leídos de la memoria se pasan a la etapa WB o se completa la operación de escritura.  
+
 ### WB
 
 ## Debug
