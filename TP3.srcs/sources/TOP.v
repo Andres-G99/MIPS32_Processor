@@ -31,8 +31,8 @@ module top
 	wire								           mips_instruction_memory_full;
 	wire								           mips_instruction_memory_empty;
 	wire [MIPS_BUS_SIZE - 1 : 0]                   mips_instruction;
-	wire [MIPS_REGISTER_CONTETNT_BUS_SIZE - 1 : 0] mips_registers_conntent;
-	wire [MIPS_MEMORY_CONTETNT_BUS_SIZE - 1 : 0]   mips_memory_conntent;
+	wire [MIPS_REGISTER_CONTETNT_BUS_SIZE - 1 : 0] mips_registers_content;
+	wire [MIPS_MEMORY_CONTETNT_BUS_SIZE - 1 : 0]   mips_memory_content;
 
     wire 					      	  		 	   uart_rd;
     wire 					      	  		 	   uart_wr;
@@ -85,8 +85,8 @@ module top
 		.i_instruction_memory_full  (mips_instruction_memory_full),
 		.i_mips_end_program			(mips_end_program),
 		.i_uart_data_rd				(uart_data_rd),
-		.i_registers_conntent		(mips_registers_conntent),
-		.i_memory_conntent			(mips_memory_conntent),
+		.i_registers_content		(mips_registers_content),
+		.i_memory_content			(mips_memory_content),
 		.o_uart_wr					(uart_wr),
 		.o_uart_rd					(uart_rd),
 		.o_mips_instruction_wr		(mips_instruction_wr),
@@ -120,8 +120,8 @@ module top
         .o_end_program   (mips_end_program),
         .o_ins_mem_full  (mips_instruction_memory_full),
         .o_ins_mem_empty (mips_instruction_memory_empty),
-        .o_registers     (mips_registers_conntent),
-        .o_mem_data      (mips_memory_conntent)
+        .o_registers     (mips_registers_content),
+        .o_mem_data      (mips_memory_content)
     );
 
 endmodule

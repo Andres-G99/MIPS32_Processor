@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module register_printer
+module reg_printer
     #(
         parameter UART_BUS_SIZE = 8,
         parameter DATA_OUT_BUS_SIZE = UART_BUS_SIZE * 7 ,
