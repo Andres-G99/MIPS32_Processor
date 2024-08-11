@@ -1,4 +1,7 @@
 # Procesador MIPS - Arquitectura de Computadoras
+## Integrantes
++ Careggio, Camila.
++ Garella, Andrés Esteban.
 ## Introducción
 Se implementa el pipeline del procesador MIPS con las siguientes etapas:
 
@@ -74,6 +77,44 @@ __Funcionamiento__:
 __Output__: Los datos leídos de la memoria se pasan a la etapa WB o se completa la operación de escritura.  
 
 ### WB
+__Función__: Escribir en memoria los resultados de la ejecución de instrucciones provenientes de las etapas anteriores.
+__Funcionamiento__:
+- Se usa la señal de control `i_mem_to_reg` para ecribir o no las señales:
+  - `i_alu_result`: Resultado de operación de la ALU.
+  - `i_mem_result`: Resultado de operación de memoria.
+
+__Output__: Los datos a escribir en los registros (`o_wb_data`).
+
+## Hazard
+### Risk Detection
+__Función__: Detección e intervención de riesgos. Previene situaciones donde aparecen riegos de datos y control.
+__Funcionamiento__:
+El módulo tiene como input señales de control que permiten tomar acción en las siguientes situaciones:
++ Riesgos de saltos:
+  + Si se detecta una instrucción `JAR`, `JR`, `BNQ` o `BEQ` y la señal `i_jmp_stop` está inactiva, la señal `o_jmp_stop` se enciende.
++ Riesgo de datos:
+  + Si los registros destino de IF/ID e ID/EX coinciden y son instrucciones de carga o la señal `o_jmp_stop` está activa, se activa `o_not_load`.
++ Propagación de control:
+  + La señal `o_ctr_reg_src` es igual a `o_not_load`, pero las diferenciamos para mejor comprensión y control del circuito.
++ Detección de Halt:
+  + Si se detecta una instrucción Halt, se termina el programa.
+
+__Output__: Señales que indican si el procesador debe introducir un _stall_ dependiendo de las condiciones antes mencionadas
+
+### Shortcut
+__Función__: Permite el adelantamiento de datos para evitar colocar un _stall_ cada vez que una instrucción depende de un valor que aún no se ha escrito en memoria.
+__Funcionamiento__:
++ Data source A:
+  + Si `i_ex_mem_addr` es igual a `i_id_ex_rs` (Data source A) y `i_id_ex_rs` no es 0 y `i_ex_mem_wb` es válido, la fuente de datos es EX/MEM.
+  + Si `i_mem_wb_addr` es igual a `i_id_ex_rs` y `i_id_ex_rs` no es 0 y `i_mem_wb_wb` es válido, la fuente de datos es MEM/WB.
+  + Cualquier otro caso, el data source es ID/EX.
+
++ Data source B:
+  + Si `i_ex_mem_addr` es igual a `i_id_ex_rt` (Data source B) y `i_id_ex_rt` no es 0 y `i_ex_mem_wb` es válido, la fuente de datos es EX/MEM.
+  + Si `i_mem_wb_addr` es igual a `i_id_ex_rt` y `i_id_ex_rt` no es 0 y `i_mem_wb_wb` es válido, la fuente de datos es MEM/WB.
+  + Entonces el data source B es dato en EX/MEM.
+
+__Output__: Data sources de los operandos A y B según dichas condiciones.
 
 ## Debug
 Modos de operación:
@@ -84,3 +125,62 @@ Para ello se implementó un módulo Debug con una interfaz y buffers. La idea or
 ![simple](img/debug_original.png)  
 A partir de esta base, los distintos flujos de la máquina de estados, quedaron de la siguiente manera:  
 ![simple](img/debug_completo.png) 
+
+## pyCOM
+API diseñada para comunicarse con la placa y ejecutar comandos e instrucciones. Módulos:
+
+### UI
+User interface. Permite la interación con la placa a través de la consola.
+Opciones del Menú:
++ Compile and load.
++ Run program.
++ Step by step program.
++ Exit.
+
+__Compile and load__: Compila y carga el programa.
+__Run program__: Ejecuta el programa normalmente y al terminar, imprime el estado de los registros y la memoria.
+__Step by step program__: Ejecuta el programa de a un ciclo de reloj e imprime el estado de los registros y la memoria en cada ciclo.
+__Exit__: Cierre de la comunicación y de la API.
+
+### instruction_set
+Set de intrucciones de referencia que le indica al compilador los reemplazos pertientes según cada instrucción y registro.
+
+### pyASM
+Compilador de assembler. Diseñado para entender y compilar las intrucciones propuestas en la consigna y siguiendo el formato de instrucción especificado [aquí](https://phoenix.goucher.edu/~kelliher/f2009/cs220/mipsir.html)
+
+__Características__:
++ Reconoce etiquetas (o funciones) para facilitar las instrucciones de salto.
+  + Formato: `LABEL: INSTURCTION rx,ry,rz`.
++ Reconoce variables de tipo _integer_ de 8, 16 y 32 bits, con o sin signo.
+  + Formato: `DEFINE [U/]INT[8/16/32] = VALUE`.
++ Acepta valores en formato binario, decimal y hexadecimal.
++ Ignora líneas que empiezan con `#` y saltos de línea.
+
+__Funcionamiento__:
+Consta de dos etapas:
++ `validate_asm_code()`: Recibe el código a compilar y luego:
+  + Detecta saltos de línea y comentarios, los cuales son ignorados.
+  + Valida las instrucciones y le asigna una dirección a las labels que encuentre.
+  + Valida los argumentos y controla que las labels estén definidas.
+  + Devuelve `True` si no hay problemas de sintaxis o dependencias.
+  
++ `assemble()`: Es la compilación propiamente dicha.
+  + Reemplaza los opcodes, los registros y las labels según corresponda.
+  + Construye cada instrucción según su tipo.
+  + Devuelve una lista con cada instrucción en machine code.
+
+### UART - (Universal Asynchronous Receiver-Transmitter)
+Módulo de comunicación asincrónica para enviar y reicibir datos de la unidad UART del proyecto.
+Utiliza las utilidades de la librería serial de Python para configurar la comunicación.
+
+__Configuración__:
++ Baudrate: 19200.
++ Bytesize: 8 bytes.
++ No parity bits
++ Stop bit: 1
+
+### Interface
+Módulo que se encarga de codificar los comandos e intrucciones a enviar y decodificar los datos recibidos.
+__Métodos públicos__:
++ `load_program()`: Envía a la placa una solicitud para cargar el programa, recibida la respuesta, se procede a la carga del programa a ejecutar.
++ `

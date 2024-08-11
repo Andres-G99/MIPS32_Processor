@@ -72,7 +72,6 @@ class pyASM():
                 self.current_line += 1
             else: # if is not an instruction, check if it is a label
                 if ':' in inst_parts[0]:
-                    #print("Label: " + inst_parts[0])
                     inst_parts[0] = inst_parts[0].replace(':', '')
                     self.labels_address_table[inst_parts[0]] = self.current_address
                     self.current_line += 1
@@ -95,10 +94,8 @@ class pyASM():
             elif len(inst) == 2: # Op arg1,arg2,arg3 o Op Label
                 args = inst[1].split(',')
                 if len(args) == 1:
-                    #print("Label: " + args[0])
                     if args[0] not in self.labels_address_table and args[0] not in self.variables_table and args[0] not in self.register_table:
                         raise Label_not_found_exception("Label not found on line " + str(self.current_line) + ": " + args[0])
-                        #print("Label not found on line " + str(self.current_line) + ": " + args[0])
             self.current_line += 1
         return True
                 
@@ -134,7 +131,7 @@ class pyASM():
                 rt = self.to_register(args[1])
                 rd = self.to_register(args[0])
                 shamt = self.dec_to_bin(int(args[2]), 5)
-                func = self.instruction_set[inst[0]][5]
+                func = self.instruction_set[inst[0]][1]
                 machine_code = self.instruction_set[inst[0]][0] + rs + rt + rd + shamt + func
                 return machine_code
             
@@ -144,7 +141,7 @@ class pyASM():
                 rs = self.to_register(args[1])
                 rt = self.to_register(args[2])
                 shamt = self.dec_to_bin(0, 5)
-                func = self.instruction_set[inst[0]][5]
+                func = self.instruction_set[inst[0]][1]
                 machine_code = self.instruction_set[inst[0]][0] + rs + rt + rd + shamt + func
                 return machine_code
         
@@ -154,7 +151,7 @@ class pyASM():
                 rs = self.to_register(args[1])
                 rt = self.to_register(args[2])
                 shamt = self.dec_to_bin(0, 5)
-                func = self.instruction_set[inst[0]][5]
+                func = self.instruction_set[inst[0]][1]
                 machine_code = self.instruction_set[inst[0]][0] + rs + rt + rd + shamt + func
                 return machine_code
         else:
@@ -164,7 +161,7 @@ class pyASM():
                 rs = self.to_register(args[1])
                 rt = self.dec_to_bin(0, 5)
                 shamt = self.dec_to_bin(0, 5)
-                func = self.instruction_set[inst[0]][5]
+                func = self.instruction_set[inst[0]][1]
                 machine_code = self.instruction_set[inst[0]][0] + rs + rt + rd + shamt + func
                 return machine_code
             
@@ -174,7 +171,7 @@ class pyASM():
                 rt = self.dec_to_bin(0, 5)
                 rd = self.dec_to_bin(0, 5)
                 shamt = self.dec_to_bin(0, 5)
-                func = self.instruction_set[inst[0]][5]
+                func = self.instruction_set[inst[0]][1]
                 machine_code = self.instruction_set[inst[0]][0] + rs + rt + rd + shamt + func
                 return machine_code
 

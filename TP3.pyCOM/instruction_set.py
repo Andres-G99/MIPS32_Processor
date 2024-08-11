@@ -39,41 +39,42 @@ FUNC_CODE_SLT  = '101010'
 
 instructionTable = {
     #R type
-    'SLL'  : [ OP_CODE_R, 'RS', 'RT', 'RD', 'SHAMT', FUNC_CODE_SLL  ],  #Rd = Rt << Shamt; Rs = 0x00
-    'SRL'  : [ OP_CODE_R, 'RS', 'RT', 'RD', 'SHAMT', FUNC_CODE_SRL  ],  #Rd = Rt >> Shamt; Rs = 0x00
-    'SRA'  : [ OP_CODE_R, 'RS', 'RT', 'RD', 'SHAMT', FUNC_CODE_SRA  ],  #Rd = Rt >>> Shamt; Rs = 0x00
-    'SLLV' : [ OP_CODE_R, 'RS', 'RT', 'RD', 'SHAMT', FUNC_CODE_SLLV ],  #Rd = Rt << Rs; Shamt = 0x00
-    'SRLV' : [ OP_CODE_R, 'RS', 'RT', 'RD', 'SHAMT', FUNC_CODE_SRLV ],  #Rd = Rt >> Rs; Shamt = 0x00
-    'SRAV' : [ OP_CODE_R, 'RS', 'RT', 'RD', 'SHAMT', FUNC_CODE_SRAV ],  #Rd = Rt >>> Rs; Shamt = 0x00
-    'ADDU' : [ OP_CODE_R, 'RS', 'RT', 'RD', 'SHAMT', FUNC_CODE_ADDU ],  #Rd = Rs + Rt; Shamt = 0x00
-    'SUBU' : [ OP_CODE_R, 'RS', 'RT', 'RD', 'SHAMT', FUNC_CODE_SUBU ],  #Rd = Rs - Rt; Shamt = 0x00
-    'AND'  : [ OP_CODE_R, 'RS', 'RT', 'RD', 'SHAMT', FUNC_CODE_AND  ],  #Rd = Rs & Rt; Shamt = 0x00
-    'OR'   : [ OP_CODE_R, 'RS', 'RT', 'RD', 'SHAMT', FUNC_CODE_OR   ],  #Rd = Rs | Rt; Shamt = 0x00
-    'XOR'  : [ OP_CODE_R, 'RS', 'RT', 'RD', 'SHAMT', FUNC_CODE_XOR  ],  #Rd = Rs ^ Rt; Shamt = 0x00
-    'NOR'  : [ OP_CODE_R, 'RS', 'RT', 'RD', 'SHAMT', FUNC_CODE_NOR  ],  #Rd = ~(Rs | Rt); Shamt = 0x00
-    'SLT'  : [ OP_CODE_R, 'RS', 'RT', 'RD', 'SHAMT', FUNC_CODE_SLT  ],  #Rd = (Rs < Rt) ? 1 : 0; Shamt = 0x00
-
+    'SLL'  : [ OP_CODE_R, FUNC_CODE_SLL  ],  #Rd = Rt << Shamt; Rs = 0x00
+    'SRL'  : [ OP_CODE_R, FUNC_CODE_SRL  ],  #Rd = Rt >> Shamt; Rs = 0x00
+    'SRA'  : [ OP_CODE_R, FUNC_CODE_SRA  ],  #Rd = Rt >>> Shamt; Rs = 0x00
+    'SLLV' : [ OP_CODE_R, FUNC_CODE_SLLV ],  #Rd = Rt << Rs; Shamt = 0x00
+    'SRLV' : [ OP_CODE_R, FUNC_CODE_SRLV ],  #Rd = Rt >> Rs; Shamt = 0x00
+    'SRAV' : [ OP_CODE_R, FUNC_CODE_SRAV ],  #Rd = Rt >>> Rs; Shamt = 0x00
+    'ADDU' : [ OP_CODE_R, FUNC_CODE_ADDU ],  #Rd = Rs + Rt; Shamt = 0x00
+    'SUBU' : [ OP_CODE_R, FUNC_CODE_SUBU ],  #Rd = Rs - Rt; Shamt = 0x00
+    'AND'  : [ OP_CODE_R, FUNC_CODE_AND  ],  #Rd = Rs & Rt; Shamt = 0x00
+    'OR'   : [ OP_CODE_R, FUNC_CODE_OR   ],  #Rd = Rs | Rt; Shamt = 0x00
+    'XOR'  : [ OP_CODE_R, FUNC_CODE_XOR  ],  #Rd = Rs ^ Rt; Shamt = 0x00
+    'NOR'  : [ OP_CODE_R, FUNC_CODE_NOR  ],  #Rd = ~(Rs | Rt); Shamt = 0x00
+    'SLT'  : [ OP_CODE_R, FUNC_CODE_SLT  ],  #Rd = (Rs < Rt) ? 1 : 0; Shamt = 0x00
+    'JALR' : [ OP_CODE_R, FUNC_CODE_JALR ], #R31 = PC + 4; PC = Rs; Shamt = 0x00
+    'JR'   : [ OP_CODE_R, FUNC_CODE_JR   ], #PC = Rs
+    
     #I type
-    'LB'   : [ OP_CODE_LB,   'RS', 'RT', 'INM' ], #Rt = sigextend(Mem[Rs + unsigextend(INM)])
-    'LH'   : [ OP_CODE_LH,   'RS', 'RT', 'INM' ], #Rt = sigextend(Mem[Rs + unsigextend(INM)])
-    'LW'   : [ OP_CODE_LW,   'RS', 'RT', 'INM' ], #Rt = Mem[Rs + unsigextend(INM)]
-    'LWU'  : [ OP_CODE_LWU,  'RS', 'RT', 'INM' ], #Rt = Mem[Rs + unsigextend(INM)]
-    'LBU'  : [ OP_CODE_LBU,  'RS', 'RT', 'INM' ], #Rt = unsigextend(Mem[Rs + unsigextend(INM)])
-    'LHU'  : [ OP_CODE_LHU,  'RS', 'RT', 'INM' ], #Rt = unsigextend(Mem[Rs + unsigextend(INM)])
-    'SB'   : [ OP_CODE_SB,   'RS', 'RT', 'INM' ], #Mem[Rs + unsigextend(INM)] = Rt[7:0] 
-    'SH'   : [ OP_CODE_SH,   'RS', 'RT', 'INM' ], #Mem[Rs + unsigextend(INM)] = Rt[15:0]
-    'SW'   : [ OP_CODE_SW,   'RS', 'RT', 'INM' ], #Mem[Rs + unsigextend(INM)] = Rt[31:0]
-    'ADDI' : [ OP_CODE_ADDI, 'RS', 'RT', 'INM' ], #Rt = Rs + sigextend(INM)
-    'ANDI' : [ OP_CODE_ANDI, 'RS', 'RT', 'INM' ], #Rt = Rs & unsigextend(INM)
-    'ORI'  : [ OP_CODE_ORI,  'RS', 'RT', 'INM' ], #Rt = Rs | unsigextend(INM)
-    'XORI' : [ OP_CODE_XORI, 'RS', 'RT', 'INM' ], #Rt = Rs ^ unsigextend(INM)
-    'LUI'  : [ OP_CODE_LUI,  'RS', 'RT', 'INM' ], #Rt = INM << 16; Rs = 0x00
-    'SLTI' : [ OP_CODE_SLTI, 'RS', 'RT', 'INM' ], #Rt = (Rs < sigextend(INM)) ? 1 : 0
-    'BEQ'  : [ OP_CODE_BEQ,  'RS', 'RT', 'INM' ], #if (Rs == Rt) PC = PC + 4 + (INM << 2)
-    'BNE'  : [ OP_CODE_BNE,  'RS', 'RT', 'INM' ], #if (Rs != Rt) PC = PC + 4 + (INM << 2)
+    'LB'   : [ OP_CODE_LB   ], #Rt = sigextend(Mem[Rs + unsigextend(INM)])
+    'LH'   : [ OP_CODE_LH   ], #Rt = sigextend(Mem[Rs + unsigextend(INM)])
+    'LW'   : [ OP_CODE_LW   ], #Rt = Mem[Rs + unsigextend(INM)]
+    'LWU'  : [ OP_CODE_LWU  ], #Rt = Mem[Rs + unsigextend(INM)]
+    'LBU'  : [ OP_CODE_LBU  ], #Rt = unsigextend(Mem[Rs + unsigextend(INM)])
+    'LHU'  : [ OP_CODE_LHU  ], #Rt = unsigextend(Mem[Rs + unsigextend(INM)])
+    'SB'   : [ OP_CODE_SB   ], #Mem[Rs + unsigextend(INM)] = Rt[7:0] 
+    'SH'   : [ OP_CODE_SH   ], #Mem[Rs + unsigextend(INM)] = Rt[15:0]
+    'SW'   : [ OP_CODE_SW   ], #Mem[Rs + unsigextend(INM)] = Rt[31:0]
+    'ADDI' : [ OP_CODE_ADDI ], #Rt = Rs + sigextend(INM)
+    'ANDI' : [ OP_CODE_ANDI ], #Rt = Rs & unsigextend(INM)
+    'ORI'  : [ OP_CODE_ORI  ], #Rt = Rs | unsigextend(INM)
+    'XORI' : [ OP_CODE_XORI ], #Rt = Rs ^ unsigextend(INM)
+    'LUI'  : [ OP_CODE_LUI  ], #Rt = INM << 16; Rs = 0x00
+    'SLTI' : [ OP_CODE_SLTI ], #Rt = (Rs < sigextend(INM)) ? 1 : 0
+    'BEQ'  : [ OP_CODE_BEQ  ], #if (Rs == Rt) PC = PC + 4 + (INM << 2)
+    'BNE'  : [ OP_CODE_BNE  ], #if (Rs != Rt) PC = PC + 4 + (INM << 2)
 
-    'JALR' : [ OP_CODE_R, 'RS', 'RT', 'RD', 'SHAMT', FUNC_CODE_JALR ], #R31 = PC + 4; PC = Rs; Shamt = 0x00
-    'JR'   : [ OP_CODE_R, 'RS', 'RT', 'RD', 'SHAMT', FUNC_CODE_JR   ], #PC = Rs
+    
     
     #J type
     'J'    : [ OP_CODE_J,   'DIR' ], #PC = (PC & 0xf0000000) | (DIR << 2)

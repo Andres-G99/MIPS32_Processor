@@ -46,8 +46,7 @@ class Uart():
 if __name__ == '__main__':
     port = get_serial_port()
     uart = Uart(port)
-    uart.write(0x01)
-    #print(uart.read())
+    uart.write(0x01) # ??
     uart.close()
 else:
     pass
