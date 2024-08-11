@@ -131,7 +131,7 @@ module id
         .CHANNELS(2), 
         .BUS_SIZE(17)
     ) 
-    mux_ctr_regs_unit 
+    mux_ctrl_regs_unit 
     (
         .selector (i_ctrl_reg_source),
         .data_in  ({17'b0, ctrl_register[16:0]}),
@@ -144,7 +144,7 @@ module id
         .CHANNELS(3), 
         .BUS_SIZE(BUS_SIZE)
     ) 
-    mux_jump_src_unit 
+    mux_jump_unit 
     (
         .selector (jmp_ctrl),
         .data_in  ({jump_pc_dir, i_ex_data_A, branch_pc_dir}),
@@ -157,7 +157,7 @@ module id
         .DATA_ORIGINAL_SIZE  (26), 
         .DATA_EXTENDED_SIZE (BUS_SIZE)
     ) 
-    extend_dir_unit  
+    extend_u_dir_unit  
     (
         .i_value (dir),
         .i_is_signed (1'b0),
@@ -170,7 +170,7 @@ module id
         .DATA_ORIGINAL_SIZE  (5), 
         .DATA_EXTENDED_SIZE (BUS_SIZE)
     ) 
-    extend_shamt_unit  
+    extend_u_shamt_unit  
     (
         .i_value (shamt),
         .i_is_signed (1'b0),
@@ -183,7 +183,7 @@ module id
         .DATA_ORIGINAL_SIZE (16), 
         .DATA_EXTENDED_SIZE (BUS_SIZE)
     ) 
-    extend_signed_inm_unit  
+    extend_s_inm_unit  
     (
         .i_value (inm),
         .i_is_signed (1'b1),
@@ -196,7 +196,7 @@ module id
         .DATA_ORIGINAL_SIZE  (16), 
         .DATA_EXTENDED_SIZE (BUS_SIZE)
     ) 
-    extend_unsigned_inm_unit 
+    extend_u_inm_unit 
     (
         .i_value (inm),
         .i_is_signed (1'b0),
@@ -233,7 +233,7 @@ module id
         .DATA_LEN (BUS_SIZE), 
         .POS_TO_SHIFT (2)
     ) 
-    shift_left_ext_inm_signed_unit  
+    shift_left_ext_inm_s_unit  
     (
         .i_value (o_inm_ext_signed),
         .o_shifted (inm_ext_signed_shifted)
