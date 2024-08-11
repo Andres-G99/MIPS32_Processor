@@ -222,7 +222,7 @@ Usamos el método `send_cmd()` para comandar a la placa a través del debuger. C
 
 __Formato y recepción de datos__:
 Cada respuesta de recibida de la UART conta de 7 bytes (Definido en `RES_SIZE_BYTES` = 7), y contiene la siguiente información:
-![](image-2.png)
+![](img/response_format.png)
 ```
 response # dato de 7 bytes de respuesta
 
@@ -238,4 +238,4 @@ Enmascaramos cada dato y los desplazamos según el lugar que ocupan en la respue
 + `data`: Dato en sí, valor de un registro o memoria, según `type`.
 
 ### Funcionamiento
-![states](<pyCOM.png>)
+![states](<img/pyCOM.png>)
