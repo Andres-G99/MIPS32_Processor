@@ -91,12 +91,27 @@ __Función__: Detección e intervención de riesgos. Previene situaciones donde 
 __Funcionamiento__:
 El módulo tiene como input señales de control que permiten tomar acción en las siguientes situaciones:
 + Riesgos de saltos:
+  | i_jmp_stop | i_if_id_funct == (CODE_FUNCT_JALR or CODE_FUNCT_JR) | i_if_id_op == CODE_OP_R_TYPE | i_if_id_op == (CODE_OP_BNE or CODE_OP_BEQ)| o_jmp_stop | 
+  |:---:|:---:|:------------:|:---:|:----------------:|
+  | 0 | 1 | 1 | x | 1 |
+  | 0 | x | x | 1 | 1 |
+  | 1/x | x | x | x | 0 |
   + Si se detecta una instrucción `JAR`, `JR`, `BNQ` o `BEQ` y la señal `i_jmp_stop` está inactiva, la señal `o_jmp_stop` se enciende.
+
 + Riesgo de datos:
+  | i_id_ex_rt == (i_if_id_rs or i_if_id_rd) | i_id_ex_op == CODE_OP[`LW`, `LB`, `LBU`, `LH`, `LHU`, `LUI`, o `LWU`] | o_jmp_stop | o_not_load |
+  |:---:|:---:|:---:|:-----:|
+  | 1 | 1 | x | 1 |
+  | x | x | 1 | 1 |
+  | 0 | x | 0 | 0 |
   + Si los registros destino de IF/ID e ID/EX coinciden y son instrucciones de carga o la señal `o_jmp_stop` está activa, se activa `o_not_load`.
 + Propagación de control:
   + La señal `o_ctr_reg_src` es igual a `o_not_load`, pero las diferenciamos para mejor comprensión y control del circuito.
 + Detección de Halt:
+  | i_if_id_op == CODE_OP_HALT | o_halt | 
+  |:-------------------------:|:--------:|
+  | 1 | 1 |
+  | 0 | 0 |
   + Si se detecta una instrucción Halt, se termina el programa.
 
 __Output__: Señales que indican si el procesador debe introducir un _stall_ dependiendo de las condiciones antes mencionadas
@@ -105,11 +120,21 @@ __Output__: Señales que indican si el procesador debe introducir un _stall_ dep
 __Función__: Permite el adelantamiento de datos para evitar colocar un _stall_ cada vez que una instrucción depende de un valor que aún no se ha escrito en memoria.
 __Funcionamiento__:
 + Data source A:
+  | Data SRC A | i_ex_mem_wb | i_mem_wb_wb | i_ex_mem_addr == i_id_ex_rs |i_mem_wb_addr == i_id_ex_rs|
+  |:------------:|:-------------:|:-------------:|:-------------:|:----------:|
+  | EX_MEM | 1 | x | 1 | x |
+  | MEM_WB | 0/x | 1 | x | 1 |
+  | ID_EX | 0/x | 0/x | 0/x | 0/x |
   + Si `i_ex_mem_addr` es igual a `i_id_ex_rs` (Data source A) y `i_id_ex_rs` no es 0 y `i_ex_mem_wb` es válido, la fuente de datos es EX/MEM.
   + Si `i_mem_wb_addr` es igual a `i_id_ex_rs` y `i_id_ex_rs` no es 0 y `i_mem_wb_wb` es válido, la fuente de datos es MEM/WB.
   + Cualquier otro caso, el data source es ID/EX.
 
 + Data source B:
+  | Data SRC B | i_ex_mem_wb | i_mem_wb_wb | i_ex_mem_addr == i_id_ex_rt |i_mem_wb_addr == i_id_ex_rt|
+  |:------------:|:-------------:|:-------------:|:-------------:|:----------:|
+  | EX_MEM | 1 | x | 1 | x |
+  | MEM_WB | 0/x | 1 | x | 1 |
+  | ID_EX | 0/x | 0/x | 0/x | 0/x |
   + Si `i_ex_mem_addr` es igual a `i_id_ex_rt` (Data source B) y `i_id_ex_rt` no es 0 y `i_ex_mem_wb` es válido, la fuente de datos es EX/MEM.
   + Si `i_mem_wb_addr` es igual a `i_id_ex_rt` y `i_id_ex_rt` no es 0 y `i_mem_wb_wb` es válido, la fuente de datos es MEM/WB.
   + Entonces el data source B es dato en EX/MEM.
@@ -180,7 +205,35 @@ __Configuración__:
 + Stop bit: 1
 
 ### Interface
-Módulo que se encarga de codificar los comandos e intrucciones a enviar y decodificar los datos recibidos.
-__Métodos públicos__:
-+ `load_program()`: Envía a la placa una solicitud para cargar el programa, recibida la respuesta, se procede a la carga del programa a ejecutar.
-+ `
+Módulo que se encarga de codificar los comandos e instrucciones a enviar y decodificar los datos recibidos.
+__Función__:
++ Provee una interfaz entre la placa, la UART, el código a ejecutar y la UI.
++ Envía comandos a la palca según la función que solicite el usuario.
++ Codifica y decodifica los comandos y/o códigos enviados y las respuestas recibidas respectivamente.
++ Recupera los datos para su lectura.
+
+__Envío de datos__:
+Usamos el método `send_cmd()` para comandar a la placa a través del debuger. Con las opciones:
+- `L`: `load_program()`: Carga del programa en la placa.
+- `C`: `run_program()`: Ejecución en modo continuo.
+- `S`: `run_next_step()`: Siguiente ciclo del step by step.
+
+__Formato y recepción de datos__:
+Cada respuesta de recibida de la UART conta de 7 bytes (Definido en `RES_SIZE_BYTES` = 7), y contiene la siguiente información:
+![](image-2.png)
+```
+response # dato de 7 bytes de respuesta
+
+type = (reponse || MASK.TYPE) >> SHIFT.TYPE
+cicle = (reponse || MASK.CICLE) >> SHIFT.CICLE
+address = (reponse || MASK.ADDRESS) >> SHIFT.ADDRESS
+data = (reponse || MASK.DATA) >> SHIFT.DATA
+```
+Enmascaramos cada dato y los desplazamos según el lugar que ocupan en la respuesta. Un vez hecho esto, podemos operar:
++ `type`: Indica el tipo de respuesta, información, error, tipo de dato, etc.
++ `cicle`: Ciclo de instrucción en el que se encuentra el programa.
++ `address`: Dirección de registro o memoria, según `type`.
++ `data`: Dato en sí, valor de un registro o memoria, según `type`.
+
+### Funcionamiento
+![states](<pyCOM.png>)
