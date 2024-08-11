@@ -29,6 +29,8 @@ Y permite las siguientes instrucciones:
 ![modo_step](/img/modo_step.png)  
 7. Verificamos que los datos sean correctos con un [análisis instrucción por instrucción](https://docs.google.com/spreadsheets/d/1HQWv1dA8hQ2l9KSv4gJhaPP8k8ei2q0zWhnZzRozxcY/edit?usp=sharing)
 ## Etapas
+Partimos del pipeline del libro:
+![book_diagram](/img/book_diagram.png) 
 
 ### IF
 
