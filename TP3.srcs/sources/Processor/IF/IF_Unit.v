@@ -41,7 +41,7 @@ module _if
         .CHANNELS(2), 
         .BUS_SIZE(BUS_SIZE)
     ) 
-    mux_2_unit_pc
+    mux_pc_unit
     (
         .selector (i_next_pc_src),
         .data_in ({i_next_not_seq_pc, i_next_seq_pc}),

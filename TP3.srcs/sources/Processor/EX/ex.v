@@ -62,7 +62,7 @@ module ex
         .ALU_OP_BUS_WIDTH (3),
         .ALU_FUNCT_BUS_WIDTH (6)
     ) 
-    alu_control_unit 
+    alu_ctrl_unit 
     (
         .i_funct (i_funct),
         .i_alu_opp (i_alu_opp),
@@ -75,7 +75,7 @@ module ex
         .CHANNELS(2), 
         .BUS_SIZE(BUS_SIZE)
     ) 
-    mux_alu_src_data_a_unit
+    mux_data_a_unit
     (
         .selector (i_alu_src_A),
         .data_in ({o_forwarded_data_A, i_shamt_ext_unsigned}),
@@ -87,7 +87,7 @@ module ex
         .CHANNELS (5), 
         .BUS_SIZE (BUS_SIZE)
     ) 
-    mux_alu_src_data_b_unit
+    mux_data_b_unit
     (
         .selector (i_alu_src_B),
         .data_in ({o_forwarded_data_B, i_inm_ext_unsigned, i_inm_ext_signed, i_inm_upp, i_next_seq_pc}),
@@ -100,7 +100,7 @@ module ex
         .CHANNELS(3), 
         .BUS_SIZE(BUS_SIZE)
     ) 
-    mux_sc_src_a_unit
+    mux_forwarding_a_unit
     (
         .selector (i_src_A_select),
         .data_in ({i_forwarded_alu_result, i_forwarded_wb_result, i_bus_A}),
@@ -112,7 +112,7 @@ module ex
         .CHANNELS(3), 
         .BUS_SIZE(BUS_SIZE)
     ) 
-    mux_sc_src_b_unit
+    mux_forwarding_b_unit
     (
         .selector (i_src_B_select),
         .data_in ({i_forwarded_alu_result, i_forwarded_wb_result, i_bus_B}),
@@ -125,7 +125,7 @@ module ex
         .CHANNELS(3), 
         .BUS_SIZE(5)
     ) 
-    mux_reg_dst_unit
+    mux_reg_destination_unit
     (
         .selector (i_reg_dst),
         .data_in ({5'b11111, i_rd, i_rt}),

@@ -67,7 +67,7 @@ module mem
         .CHANNELS (3), 
         .BUS_SIZE (IO_BUS_SIZE)
     ) 
-    mux_in_mem_unit
+    mux_write_mem_unit
     (
         .selector (i_mem_wr_src),
         .data_in ({bus_b_uext_byte, bus_b_uext_halfword, i_bus_b}),
@@ -80,7 +80,7 @@ module mem
         .CHANNELS (5), 
         .BUS_SIZE (IO_BUS_SIZE)
     ) 
-    mux_out_mem_unit
+    mux_read_format_unit
     (
         .selector (i_mem_rd_src),
         .data_in ({mem_out_data_uext_byte, mem_out_data_uext_halfword, mem_out_data_sext_byte, mem_out_data_sext_halfword, mem_out_data}),
@@ -93,7 +93,7 @@ module mem
         .DATA_ORIGINAL_SIZE (IO_BUS_SIZE / 2), 
         .DATA_EXTENDED_SIZE (IO_BUS_SIZE)
     ) 
-    unsig_extend_bus_b_halfword_unit 
+    extend_b_usig_halfword_unit 
     (
         .i_value (bus_b_halfword),
         .i_is_signed (1'b0),
@@ -105,7 +105,7 @@ module mem
         .DATA_ORIGINAL_SIZE (8), 
         .DATA_EXTENDED_SIZE (IO_BUS_SIZE)
     ) 
-    unsig_extend_bus_b_byte_unit 
+    extend_b_usig_byte_unit 
     (
         .i_value (bus_b_byte),
         .i_is_signed (1'b0),
@@ -117,7 +117,7 @@ module mem
         .DATA_ORIGINAL_SIZE (IO_BUS_SIZE / 2), 
         .DATA_EXTENDED_SIZE (IO_BUS_SIZE)
     ) 
-    unsig_extend_mem_out_data_halfword_unit 
+    extend_usig_mem_out_halfword_unit 
     (
         .i_value (mem_out_data_halfword),
         .i_is_signed (1'b0),
@@ -129,7 +129,7 @@ module mem
         .DATA_ORIGINAL_SIZE (8), 
         .DATA_EXTENDED_SIZE (IO_BUS_SIZE)
     ) 
-    unsig_extend_mem_out_data_byte_unit 
+    extend_usig_mem_out_byte_unit 
     (
         .i_value (mem_out_data_byte),
         .i_is_signed (1'b0),
@@ -141,7 +141,7 @@ module mem
         .DATA_ORIGINAL_SIZE (IO_BUS_SIZE / 2), 
         .DATA_EXTENDED_SIZE (IO_BUS_SIZE)
     ) 
-    sig_extend_mem_out_data_halfword_unit
+    extend_sig_mem_out_halfword_unit
     (
         .i_value (mem_out_data_halfword),
         .i_is_signed (1'b1),
@@ -153,7 +153,7 @@ module mem
         .DATA_ORIGINAL_SIZE (8), 
         .DATA_EXTENDED_SIZE (IO_BUS_SIZE)
     )
-    sig_extend_mem_out_data_byte_unit
+    extend_sig_mem_out_byte_unit
     (
         .i_value (mem_out_data_byte),
         .i_is_signed (1'b1),

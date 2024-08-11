@@ -65,7 +65,7 @@ module top
       .o_data_to_read (uart_data_rd)
     );
 
-	debugger
+	debug
 	#(
 		.UART_BUS_SIZE (UART_DATA_BITS),
         .DATA_IN_BUS_SIZE (UART_DATA_BITS * 4),
@@ -75,7 +75,7 @@ module top
 		.MEMORY_SLOT_SIZE (MIPS_BUS_SIZE),
 		.MEMORY_DATA_BUS_SIZE (MIPS_MEMORY_CONTETNT_BUS_SIZE)
 	)
-	debugger_unit
+	debug_unit
 	(
 		.i_clk (i_clk),
 		.i_reset (i_reset),

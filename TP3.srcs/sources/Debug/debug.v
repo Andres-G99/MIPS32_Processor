@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module debugger
+module debug
     #(
         parameter UART_BUS_SIZE = 8,
         parameter DATA_IN_BUS_SIZE = UART_BUS_SIZE * 4,
@@ -76,7 +76,7 @@ module debugger
         .DATA_LEN (UART_BUS_SIZE),
         .DATA_OUT_LEN (DATA_IN_BUS_SIZE)
     )
-    uart_reader_unit
+    buffer_reader_unit
     (
         .i_clk (i_clk),
         .i_reset (i_reset),
@@ -93,7 +93,7 @@ module debugger
         .DATA_LEN (UART_BUS_SIZE),
         .DATA_IN_LEN (DATA_OUT_BUS_SIZE)
     )
-    uart_writer_unit
+    buffer_writer_unit
     (
         .i_clk (i_clk),
         .i_reset (i_reset),
@@ -112,7 +112,7 @@ module debugger
         .REGISTER_SIZE (REGISTER_SIZE),
         .REGISTER_BANK_BUS_SIZE (REGISTER_BANK_BUS_SIZE)
     )
-    register_printer_unit
+    reg_printer_unit
     (
         .i_clk (i_clk),
         .i_reset (i_reset),
@@ -132,7 +132,7 @@ module debugger
         .MEMORY_SLOT_SIZE (MEMORY_SLOT_SIZE),
         .MEMORY_DATA_BUS_SIZE (MEMORY_DATA_BUS_SIZE)
     )
-    memory_printer_unit
+    mem_printer_unit
     (
         .i_clk (i_clk),
         .i_reset (i_reset),
@@ -152,7 +152,7 @@ module debugger
         .DATA_OUT_LEN (DATA_OUT_BUS_SIZE),
         .REG_LEN (REGISTER_SIZE)
     )
-    debugger_control_unit
+    interface_unit
     (
         .i_clk (i_clk),
         .i_reset (i_reset),

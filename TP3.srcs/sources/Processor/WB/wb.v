@@ -22,7 +22,7 @@ module wb
         .CHANNELS (2), 
         .BUS_SIZE (BUS_WIDTH)
     ) 
-    mux_wb_data
+    mux_wb_unit
     (
         .selector (i_mem_to_reg),
         .data_in ({i_alu_result, i_mem_result}),
