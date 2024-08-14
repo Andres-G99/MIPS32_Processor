@@ -27,13 +27,16 @@ module _if
         output wire o_full_mem,
         output wire o_empty_mem,
         output wire [WORD_SIZE_IN_BYTES*8 - 1 : 0] o_instruction,
-        output wire [PC_SIZE - 1 : 0] o_next_seq_pc
+        output wire [PC_SIZE - 1 : 0] o_next_seq_pc,
+        output wire [PC_SIZE - 1 : 0] o_current_pc
     );
     
     localparam BUS_SIZE = WORD_SIZE_IN_BYTES * 8;
 
     wire [PC_SIZE - 1 : 0] next_pc;
     wire [PC_SIZE - 1 : 0] pc;
+
+    assign o_current_pc = pc;
 
     /* Selecciona proximo PC (secuencial o no secuencial)*/
     mux 

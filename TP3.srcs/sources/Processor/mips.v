@@ -22,7 +22,8 @@ module mips
         output wire o_ins_mem_full,
         output wire o_ins_mem_empty,
         output wire [REGISTERS_BANK_SIZE * DATA_BUS_SIZE - 1 : 0] o_registers,
-        output wire [2**DATA_MEMORY_ADDR_SIZE * DATA_BUS_SIZE - 1 : 0] o_mem_data
+        output wire [2**DATA_MEMORY_ADDR_SIZE * DATA_BUS_SIZE - 1 : 0] o_mem_data,
+        output wire [PC_BUS_SIZE - 1 : 0] o_current_pc
     );
 
     /* for if stage */
@@ -144,7 +145,8 @@ module mips
         .o_full_mem (o_ins_mem_full),
         .o_empty_mem (o_ins_mem_empty),
         .o_instruction (o_if_instruction),
-        .o_next_seq_pc (o_if_next_seq_pc)
+        .o_next_seq_pc (o_if_next_seq_pc),
+        .o_current_pc (o_current_pc)
     );
 
     if_id

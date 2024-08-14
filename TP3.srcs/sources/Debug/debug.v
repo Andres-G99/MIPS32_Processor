@@ -21,6 +21,7 @@ module debug
         input wire [UART_BUS_SIZE - 1 : 0] i_uart_data_rd, // data que llega desde la uart
         input wire [REGISTER_BANK_BUS_SIZE - 1 : 0] i_registers_content, // contenido de registros
         input wire [MEMORY_DATA_BUS_SIZE - 1 : 0] i_memory_content, // contenido de memoria
+        input wire [REGISTER_SIZE - 1 : 0] i_current_pc,
         output wire o_uart_wr, // datos escritos
         output wire o_uart_rd, //  datos leidos
         output wire o_mips_instruction_wr, // nueva instruccion
@@ -120,6 +121,7 @@ module debug
         .i_is_mem(1'b0),
         .i_reg_bank (i_registers_content),
         .i_clk_cicle (clk_cicle),
+        .i_current_pc (i_current_pc),
         .i_write_finish (end_uart_wr),
         .o_write (start_uart_wr_printer),
         .o_finish (end_register_print),
@@ -141,6 +143,7 @@ module debug
         .i_is_mem(1'b1),
         .i_reg_bank (i_memory_content),
         .i_clk_cicle (clk_cicle),
+        .i_current_pc (i_current_pc),
         .i_write_finish (end_uart_wr),
         .o_write (start_uart_wr_memory),
         .o_finish (end_memory_print),
