@@ -239,3 +239,9 @@ Enmascaramos cada dato y los desplazamos según el lugar que ocupan en la respue
 
 ### Funcionamiento
 ![states](<img/pyCOM.png>)
+
+## Análisis en frecuencia
+
+
+## Repositorio
+[Link al repositorio](https://github.com/Andres-G99/TP3_MIPS32_Processor)
