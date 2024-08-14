@@ -106,7 +106,7 @@ class UI():
             if program_state: # Program finished
                 reg = self.interface.get_reg_last_cicle()
                 mem = self.interface.get_mem_last_cicle()
-                self.print_table(reg, mem, True)
+                self.print_table(reg, mem, pc, True)
                 print("Program finished.")
             else:
                 print("Error running program.")
@@ -196,4 +196,5 @@ class UI():
                 mem = " " * len(half_twidth - 1)
             print(reg + " " + "|" + " " + mem)
 
+        pc = '0x' + format(pc, '032x').upper()
         print(f"{line_len}\nPC: {pc}\n{line_len}")
