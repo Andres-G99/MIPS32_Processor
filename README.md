@@ -24,9 +24,9 @@ Y permite las siguientes instrucciones:
 4. El programa será compilado y cargado
 ![load_program](/img/load_program.png)
 5. Volver a elegir la acción a realizar, en este caso _2. Run program_ y observaremos el estado de los registros y datos de memoria al finalizar la ejecución completa. MODO CONTINUO
-![modo_continuo](/img/modo_continuo.png)
+![modo_continuo](/img/modo_continuo_pc.png)
 6. Elegir la acción _3. Step by step program_ y presionar "N" para ejecutar los siguientes pasos. Se imprimen los registros y datos de memoria en cada paso. MODO STEP
-![modo_step](/img/modo_step.png)  
+![modo_step](/img/modo_step_pc.png)  
 7. Verificamos que los datos sean correctos con un [análisis instrucción por instrucción](https://docs.google.com/spreadsheets/d/1HQWv1dA8hQ2l9KSv4gJhaPP8k8ei2q0zWhnZzRozxcY/edit?usp=sharing)
 ## Etapas
 Partimos del pipeline del libro:
