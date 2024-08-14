@@ -11,6 +11,7 @@ module reg_printer
         input wire i_clk,
         input wire i_reset,
         input wire i_write_finish, // final de una operación de escritura
+        input wire i_is_mem, // 1 si es memoria, 0 si es registro
         input wire i_start, 
         input wire [REGISTER_BANK_BUS_SIZE - 1 : 0] i_reg_bank, // contenido del register bank
         input wire [UART_BUS_SIZE - 1 : 0] i_clk_cicle,
@@ -78,7 +79,7 @@ module reg_printer
             begin
                 if (reg_pointer < REGISTER_BANK_BUS_SIZE / REGISTER_SIZE) // leer de a un registro
                     begin // 1 PARA REG Y 01 PARA MEM
-                        data_write_next = {8'b00000001, i_clk_cicle, { { (UART_BUS_SIZE - REG_POINTER_SIZE - 1) { 1'b0 } }, reg_pointer } , i_reg_bank[reg_pointer * REGISTER_SIZE +: REGISTER_SIZE] };
+                        data_write_next = {i_is_mem ? 8'b00000010 : 8'b00000001, i_clk_cicle, { { (UART_BUS_SIZE - REG_POINTER_SIZE - 1) { 1'b0 } }, reg_pointer } , i_reg_bank[reg_pointer * REGISTER_SIZE +: REGISTER_SIZE] };
                         reg_pointer_next = reg_pointer + 1;
                         write_next = 1'b1;
                         state_next = STATE_WAIT_WR_TRANSITION;

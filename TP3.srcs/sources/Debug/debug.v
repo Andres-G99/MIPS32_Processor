@@ -117,6 +117,7 @@ module debug
         .i_clk (i_clk),
         .i_reset (i_reset),
         .i_start (start_register_print),
+        .i_is_mem(1'b0),
         .i_reg_bank (i_registers_content),
         .i_clk_cicle (clk_cicle),
         .i_write_finish (end_uart_wr),
@@ -125,19 +126,20 @@ module debug
         .o_data_write (data_uart_wr_printer)
     );
 
-    mem_printer
+    reg_printer
     #(
         .UART_BUS_SIZE (UART_BUS_SIZE),
         .DATA_OUT_BUS_SIZE (DATA_OUT_BUS_SIZE),
-        .MEMORY_SLOT_SIZE (MEMORY_SLOT_SIZE),
-        .MEMORY_DATA_BUS_SIZE (MEMORY_DATA_BUS_SIZE)
+        .REGISTER_SIZE (MEMORY_SLOT_SIZE),
+        .REGISTER_BANK_BUS_SIZE (MEMORY_DATA_BUS_SIZE)
     )
     mem_printer_unit
     (
         .i_clk (i_clk),
         .i_reset (i_reset),
         .i_start (start_memory_print),
-        .i_mem_bank (i_memory_content),
+        .i_is_mem(1'b1),
+        .i_reg_bank (i_memory_content),
         .i_clk_cicle (clk_cicle),
         .i_write_finish (end_uart_wr),
         .o_write (start_uart_wr_memory),
