@@ -23,6 +23,7 @@ class Result(Enum):
     INFO = 0x00
     REG = 0x01
     MEM = 0x02
+    PC = 0x03
 
 class Mask(Enum):
     TYPE = 0xFF000000000000
@@ -45,6 +46,7 @@ class Interface():
     step_mode_flg = False
     registers = []
     memory = []
+    pc = 0
 
     def __init__(self, uart: Uart):
         self.uart = uart
@@ -113,6 +115,8 @@ class Interface():
                 self.registers.append({'cicle': res_cicle, 'addr': res_addr, 'data': res_data})
             elif res_type == Result.MEM.value:
                 self.memory.append({'cicle': res_cicle, 'addr': res_addr, 'data': res_data})
+            elif res_type == Result.PC.value:
+                self.pc = res_data
             else:
                 time.sleep(0.1)
 
@@ -158,7 +162,8 @@ class Interface():
     def get_mem_by_cicle(self, cicle: int):
         return [mem for mem in self.memory if mem['cicle'] == cicle]
 
-    # by Address?
+    def get_pc(self):
+        return self.pc
 
     def get_reg_last_cicle(self):
         if not self.registers:

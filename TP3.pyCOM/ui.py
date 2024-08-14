@@ -77,7 +77,8 @@ class UI():
         self.interface.run_program(ExecMode.RUN)
         reg = self.interface.registers
         mem = self.interface.memory
-        self.print_table(reg, mem, False)
+        pc = self.interface.get_pc()
+        self.print_table(reg, mem, pc, False)
         input("\nPress Enter to continue...")
         self.main_menu()
 
@@ -90,8 +91,9 @@ class UI():
                 print("Stepping program...\n")
                 reg = self.interface.get_reg_last_cicle()
                 mem = self.interface.get_mem_last_cicle()
+                pc = self.interface.get_pc()
                 print("Printing table...\n")
-                self.print_table(reg, mem, True)
+                self.print_table(reg, mem, pc, True)
 
                 while usr_input := input("N to next step: "):
                     if usr_input.lower() == 'n':
@@ -143,7 +145,7 @@ class UI():
         #print(byte_list)
         return byte_list
 
-    def print_table(self, register: list, memory: list, by_cicle: bool):
+    def print_table(self, register: list, memory: list, pc: int, by_cicle: bool):
         terminal_width = os.get_terminal_size().columns
         half_twidth = terminal_width // 2
         line_len = '-' * terminal_width
@@ -193,3 +195,5 @@ class UI():
             else:
                 mem = " " * len(half_twidth - 1)
             print(reg + " " + "|" + " " + mem)
+
+        print(f"{line_len}\nPC: {pc}\n{line_len}")

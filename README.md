@@ -38,7 +38,7 @@ __Función__: Obtener la próxima instrucción de la memoria.
 __Funcionamiento__: 
 - Se obtiene la instrucción basándose en la dirección del PC.
 - El PC se actualiza para apuntar a la siguiente instrucción. Se incrementa en 32 bits si es secuencial. 
-- Se implementan módulos para llevar la cuenta del pc y para guardar las intrucciones. 
+- Se implementan módulos para llevar la cuenta del pc y para guardar las instrucciones. 
 
 __Output__: Instrucción obtenida y el PC actualizado se prepara para el siguiente fetch.
 
@@ -120,7 +120,7 @@ __Output__: Señales que indican si el procesador debe introducir un _stall_ dep
 
 ### Shortcut
 __Función__: Permite el adelantamiento de datos para evitar colocar un _stall_ cada vez que una instrucción depende de un valor que aún no se ha escrito en memoria.
-__Funcionamiento__:
+__Funcionamiento__:  
 + Data source A:
   | Data SRC A | i_ex_mem_wb | i_mem_wb_wb | i_ex_mem_addr == i_id_ex_rs |i_mem_wb_addr == i_id_ex_rs|
   |:------------:|:-------------:|:-------------:|:-------------:|:----------:|
@@ -164,13 +164,13 @@ Opciones del Menú:
 + Step by step program.
 + Exit.
 
-__Compile and load__: Compila y carga el programa.
-__Run program__: Ejecuta el programa normalmente y al terminar, imprime el estado de los registros y la memoria.
-__Step by step program__: Ejecuta el programa de a un ciclo de reloj e imprime el estado de los registros y la memoria en cada ciclo.
-__Exit__: Cierre de la comunicación y de la API.
+__Compile and load__: Compila y carga el programa.  
+__Run program__: Ejecuta el programa normalmente y al terminar, imprime el estado de los registros y la memoria.  
+__Step by step program__: Ejecuta el programa de a un ciclo de reloj e imprime el estado de los registros y la memoria en cada ciclo.  
+__Exit__: Cierre de la comunicación y de la API.  
 
 ### instruction_set
-Set de intrucciones de referencia que le indica al compilador los reemplazos pertientes según cada instrucción y registro.
+Set de isntrucciones de referencia que le indica al compilador los reemplazos pertientes según cada instrucción y registro.
 
 ### pyASM
 Compilador de assembler. Diseñado para entender y compilar las intrucciones propuestas en la consigna y siguiendo el formato de instrucción especificado [aquí](https://phoenix.goucher.edu/~kelliher/f2009/cs220/mipsir.html)

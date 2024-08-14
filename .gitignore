@@ -1,2 +1,5 @@
 /TP3.pyCOM/__pycache__/
 /TP3.pyCOM/pyenv/
+/TP3.cache/
+/TP3.runs/
+*.xpr
