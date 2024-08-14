@@ -36,8 +36,6 @@ module alu_ctrl
         case(i_alu_opp)
             CTRL_R_TYPE      : alu_ctrl = i_funct;
             CTRL_LOAD_TYPE   : alu_ctrl = EX_ADD;
-            CTRL_STORE_TYPE  : alu_ctrl = EX_ADD;
-            CTRL_ADDI        : alu_ctrl = EX_ADD;
             CTRL_JUMP_TYPE   : alu_ctrl = EX_SC_B;
             CTRL_ANDI        : alu_ctrl = EX_AND;
             CTRL_ORI         : alu_ctrl = EX_OR;
