@@ -243,7 +243,9 @@ Enmascaramos cada dato y los desplazamos según el lugar que ocupan en la respue
 ## Análisis en frecuencia
 
 Al aumentar la frecuencia del clock a más de 100 MHz vemos que no se cumplen las timing contraints y tenemos los siguientes path críticos, que representan el acceso a registros:
-![img](/img/critical_path.png)
+![img](/img/critical_path.png)  
+En la frecuencia normal de operación podemos oberservar que no hay path críticos y el procesador funciona con normalidad:
+![img](/img/no_critical_path.png)  
 
 ## Repositorio
 [Link al repositorio](https://github.com/Andres-G99/TP3_MIPS32_Processor)
