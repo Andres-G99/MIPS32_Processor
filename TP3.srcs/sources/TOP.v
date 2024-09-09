@@ -43,6 +43,14 @@ module top
 	wire [UART_DATA_BITS - 1 : 0] uart_data_rd;
 
     wire [4: 0] state;
+    
+    wire clk;
+    
+    clk_wiz_0 clk_wiz_0_unit
+    (
+    .clk_in1 (i_clk),
+    .clk_out1 (clk)
+    );
 
     uart
     #(
@@ -54,7 +62,7 @@ module top
     )
     uart_unit
     (
-      .i_clk (i_clk),
+      .i_clk (clk),
       .i_reset (i_reset),
       .i_read_uart (uart_rd),
       .i_write_uart (uart_wr),
@@ -78,7 +86,7 @@ module top
 	)
 	debug_unit
 	(
-		.i_clk (i_clk),
+		.i_clk (clk),
 		.i_reset (i_reset),
 		.i_uart_empty (uart_rx_empty),
 		.i_uart_full (uart_tx_full),
@@ -112,7 +120,7 @@ module top
     )
     mips_unit
     (
-        .i_clk (i_clk),
+        .i_clk (clk),
         .i_reset (i_reset),
         .i_enable (mips_enabled),
         .i_flush (mips_flush),

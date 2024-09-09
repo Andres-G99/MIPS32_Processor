@@ -242,10 +242,17 @@ Enmascaramos cada dato y los desplazamos según el lugar que ocupan en la respue
 
 ## Análisis en frecuencia
 
-Al aumentar la frecuencia del clock a más de 100 MHz vemos que no se cumplen las timing contraints y tenemos los siguientes path críticos, que representan el acceso a registros:
-![img](/img/critical_path.png)  
-En la frecuencia normal de operación podemos oberservar que no hay path críticos y el procesador funciona con normalidad:
-![img](/img/no_critical_path.png)  
+Agregando un clock wizard para variar la frecuencia del clock, vemos que a partir de los 65MHz comenzamos a tener path críticos que no cumplen las condiciones de timing.
+![img](/img/path_criticos.png)  
+
+El detalle de lo que sucede en este path es el siguiente.
+![img](/img/path1.png) 
+Lo que está sucediendo es que la etapa MEM/WB está pasando el Data source B a la unidad de cortocircuito. En ella se determina si se debe adelantar el dato a otra etapa del pipeline. Observando la matriz mencionada anteriormente (en la sección Shortcut Unit), vemos que una de las opciones es enviar el dato a ID/EX. Luego de ello se determina en la unidad is_equal si los datos son iguales y el salto debe hacerse efectivo o no. Se calcula el valor del PC y se envía a la pc unit para asignarlo.
+```
+add r3, r4, r2 // r2 = r3 + r4 (wb)
+beq r2, r5
+```
 
 ## Repositorio
 [Link al repositorio](https://github.com/Andres-G99/TP3_MIPS32_Processor)
+
