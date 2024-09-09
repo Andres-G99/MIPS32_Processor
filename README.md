@@ -221,21 +221,23 @@ Usamos el método `send_cmd()` para comandar a la placa a través del debuger. C
 - `S`: `run_next_step()`: Siguiente ciclo del step by step.
 
 __Formato y recepción de datos__:
-Cada respuesta de recibida de la UART conta de 7 bytes (Definido en `RES_SIZE_BYTES` = 7), y contiene la siguiente información:
+Cada respuesta de recibida de la UART cuenta con 11 bytes (Definido en `RES_SIZE_BYTES` = 11), y contiene la siguiente información:
 ![](img/response_format.png)
 ```
-response # dato de 7 bytes de respuesta
+response # dato de 11 bytes de respuesta
 
 type = (reponse || MASK.TYPE) >> SHIFT.TYPE
-cicle = (reponse || MASK.CICLE) >> SHIFT.CICLE
+cycle = (reponse || MASK.CYCLE) >> SHIFT.CYCLE
 address = (reponse || MASK.ADDRESS) >> SHIFT.ADDRESS
 data = (reponse || MASK.DATA) >> SHIFT.DATA
+pc = (reponse || MASK.DATA) >> SHIFT.PC
 ```
 Enmascaramos cada dato y los desplazamos según el lugar que ocupan en la respuesta. Un vez hecho esto, podemos operar:
 + `type`: Indica el tipo de respuesta, información, error, tipo de dato, etc.
-+ `cicle`: Ciclo de instrucción en el que se encuentra el programa.
++ `cycle`: Ciclo de instrucción en el que se encuentra el programa.
 + `address`: Dirección de registro o memoria, según `type`.
 + `data`: Dato en sí, valor de un registro o memoria, según `type`.
++ `pc`: Program counter en el instate de ejecución, según `type`.
 
 ### Funcionamiento
 ![states](<img/pyCOM.png>)
